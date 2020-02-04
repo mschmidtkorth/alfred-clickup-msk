@@ -23,7 +23,7 @@ For this workflow you need
 - [ClickUp 2.0](https://docs.clickup.com/en/articles/3005140-guide-to-switching-to-2-0) (will not work with 1.0)
 - Alfred 4 with a [Powerpack](https://www.alfredapp.com/powerpack/) license
 
-To install, download the [latest release](https://github.com/mschmidtkorth/alfred-clickup-msk-test/releases/latest) and open the `.alfredworkflow` file.
+To install, download the [latest release](https://github.com/mschmidtkorth/alfred-clickup-msk/releases/latest) and open the `.alfredworkflow` file.
 
 ## Configuration
 Before being able to connect to ClickUp, certain parameters need to be configured. Configuration can be initiated via the `cu:config` command in Alfred, or by simply typing `cu` when starting the workflow for the first time. See [ClickUp Terminology](#clickup-terminology) for an explanation of terms.
