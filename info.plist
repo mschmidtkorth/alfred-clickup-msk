@@ -310,7 +310,7 @@
 	<key>disabled</key>
 	<false/>
 	<key>name</key>
-	<string>ClickUp - Python</string>
+	<string>ClickUp</string>
 	<key>objects</key>
 	<array>
 		<dict>
@@ -1183,6 +1183,8 @@ Uses fuzzy search instead of Alfred filtering.</string>
 			<integer>125</integer>
 		</dict>
 	</dict>
+	<key>variablesdontexport</key>
+	<array/>
 	<key>version</key>
 	<string>1.0.0</string>
 	<key>webaddress</key>
