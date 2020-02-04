@@ -35,7 +35,6 @@ hasFoundMatch = False
 isDoNotDisplayCreate = False
 isCustomTagEntered = False
 
-
 def retrieveLabelsFromAPI():
 	'''Retrieves list of available Labels from ClickUp.
 	'''
@@ -255,140 +254,6 @@ def checkUpdates(wf3):
 			wf.start_update()
 
 
-def main(wf):
-	global query
-	# Check if there is a user input
-	if len(wf.args):
-		query = wf.args[0]
-	else:
-		query = None
-	if DEBUG > 0:
-		log.debug('[ main() ] - ' + query)
-
-	firstRun(wf3)
-	checkConfig(wf3)
-
-	# Evaluate input for description/content
-	global isDoNotDisplayCreate
-	if len(query.split(' :')) > 3: # Check if user is trying to add a second description - not possible
-		if DEBUG > 0:
-			log.debug('Attempted to define additional description.')
-		isDoNotDisplayCreate = True
-		wf3.add_item(title = 'Description already defined.', subtitle = 'Please remove the second \':\' defining a content.', valid = False,
-			# arg = 'cu ' + query + ' ',
-			autocomplete = query + ' ',
-			icon = ICON_WARNING)
-		wf3.send_feedback()
-
-	# Evaluate input for labels
-	for idx, labelIdentifier in enumerate(query.split(' #')):
-		hasAtLeastOneLabel = len(query.split(' #')) > 1
-		isLabelLastOne = idx == len(query.split(' #')) - 1
-		if hasAtLeastOneLabel and isLabelLastOne:
-			posFollowUpIdentifier = 0
-			posFollowUpList = labelIdentifier.find(' +')
-			posFollowUpTPriority = labelIdentifier.find(' !')
-			# Either + or ! may come directly after a #, so we only need to consider one
-			if posFollowUpList > -1: # Found match
-				posFollowUpIdentifier = posFollowUpList
-			elif posFollowUpTPriority > -1: # Found match
-				posFollowUpIdentifier = posFollowUpTPriority
-			if posFollowUpIdentifier:
-				labelIdentifier = labelIdentifier[0:posFollowUpIdentifier] # Extract text from # until +/!
-				log.debug(labelIdentifier[0:posFollowUpIdentifier])
-			else: # End of string
-				labelIdentifier = labelIdentifier[0:len(labelIdentifier)]
-				log.debug(labelIdentifier[0:len(labelIdentifier)])
-			if DEBUG > 1:
-				log.debug('labelIdentifier: ' + str(labelIdentifier))
-				log.debug(labelIdentifier)
-			if not posFollowUpIdentifier: # Only if tag is at the end of input, not if followed by other command-characters such as +/!
-				getLabels(labelIdentifier)
-
-	# Evaluate input for priorities
-	if len(query.split(' !')) < 3: # Check if user is trying to add a second priority - not possible
-		for idx, priorityIdentifier in enumerate(query.split(' !')): # No priority yet entered, suggest.
-			posFollowUpIdentifier = 0
-			hasAtLeastOnePriority = len(query.split(' !')) > 1
-			if hasAtLeastOnePriority:
-				posFollowUpTag = priorityIdentifier.find(' #') # If a tag follows after a list definition, treat it as end of string.
-				if posFollowUpTag > -1:
-					posFollowUpIdentifier = posFollowUpTag
-				if posFollowUpIdentifier:
-					priorityIdentifier = priorityIdentifier[0:posFollowUpIdentifier]
-					log.debug(priorityIdentifier[0:posFollowUpIdentifier])
-				if not posFollowUpIdentifier:
-					getPriorities(priorityIdentifier)
-	else:
-		if DEBUG > 0:
-			log.debug('Attempted to define additional priority.')
-		isDoNotDisplayCreate = True
-		wf3.add_item(title = 'Priority already defined.', subtitle = 'Please remove the second \'!\' defining a priority.', valid = False,
-			#arg = 'cu ' + query + ' ',
-			autocomplete = query + ' ',
-			icon = ICON_WARNING)
-		wf3.send_feedback()
-
-	# Evaluate input for lists
-	if len(query.split(' +')) < 3:
-		for idx, listIdentifier in enumerate(query.split(' +')): # No list yet entered, suggest.
-			if idx > 0: # Start from 1, as 0 is everything to the left of +
-				posFollowUpIdentifier = 0
-				# Lists are different from Labels/Priorities, as they might have spaces. To prevent calling getLists() if the user entered e.g. 'cu Title +My List With Spaces #x' to select label x - as calling getLists() would add secondary JSON output -, we stop when we find #/!.
-				# If +List is followed by either #Tag or !Priority, only extract list name from + until #/!.
-				hasAtLeastOneList = len(query.split(' +')) > 1
-				if hasAtLeastOneList:
-					posFollowUpTag = listIdentifier.find(' #')
-					posFollowUpTPriority = listIdentifier.find(' !')
-					# Either # or ! may come directly after a !, so we only need to consider one
-					if DEBUG > 1:
-						log.debug('listIdentifier:')
-					if posFollowUpTag > -1: # Found match
-						posFollowUpIdentifier = posFollowUpTag
-					elif posFollowUpTPriority > -1:
-						posFollowUpIdentifier = posFollowUpTPriority
-					if posFollowUpIdentifier:
-						listIdentifier = listIdentifier[0:posFollowUpIdentifier] # Extract text from + until #/!
-						log.debug(listIdentifier[0:posFollowUpIdentifier])
-					else:
-						listIdentifier = listIdentifier[0:len(listIdentifier)]
-						log.debug(listIdentifier[0:len(listIdentifier)])
-				if not posFollowUpIdentifier and hasAtLeastOneList:
-					getLists(listIdentifier, True)
-				elif hasAtLeastOneList: # Get lists from API or from cache, to update availableistsIdName/availableListsNameId for passing the Id to createTask.py. Do not generate list items. As the user can only select a single list, this is not an issue of unnecessary API calls - if the user attempts to add another one, we will not callout and instead fall back to the default list. Lists will not be displayed.
-					getLists(listIdentifier, False)
-	else:
-		if DEBUG > 0:
-			log.debug('Attempted to define additional list.')
-		isDoNotDisplayCreate = True
-		wf3.add_item(title = 'List already defined.', subtitle = 'Please remove the second \'+\' defining a list.', valid = False,
-			# arg = 'cu ' + query + ' ',
-			autocomplete = query + ' ',
-			icon = ICON_WARNING)
-		wf3.send_feedback()
-
-	# Extract different parts from input
-	inputName = getNameFromInput(query)
-	inputContent = getContentFromInput(query)
-	inputTags = getTagsFromInput(query)
-	inputDue = getDueFromInput(query)
-	inputList = getListFromInput(query)
-	inputPriority = getPriorityFromInput(query)
-
-
-	# Show 'Create Task' if user has completed their input - and no previous list item has been generated (JSON garbage).
-	inputEndsWithCommand = query[-2:] == ' #' or query[-2:] == ' !' or query[-2:] == ' +'
-	# log.debug('createListItemNotification - conditions: ')
-	# log.debug('inputEndsWithCommand: ' + str(inputEndsWithCommand))
-	# log.debug('doNotDisplayCreate: ' + str(isDoNotDisplayCreate))
-	# log.debug('hasFoundMatch: ' + str(hasFoundMatch))
-	# log.debug('isCustomTagEntered: ' + str(isCustomTagEntered))
-	if not inputEndsWithCommand and not isDoNotDisplayCreate and (not hasFoundMatch or isCustomTagEntered):
-		addCreateTaskItem(inputName, inputContent, inputDue, inputPriority, inputTags, inputList)
-		checkUpdates(wf3) # Output *after* 'Create Task', so user is not pestered by the notiifcation when trying to create a task
-		wf3.send_feedback()
-
-
 def addCreateTaskItem(inputName, inputContent, inputDue, inputPriority, inputTags, inputList):
 	'''Displays a 'Create Task?' list item.
 
@@ -432,6 +297,10 @@ def formatNotificationText(inputContent, inputDue, inputTags, inputPriority, ava
 	@param list availableListsIdName: Assignment of List Ids to List Names.
 	@param bool lineBreaks: Whether to include a line break after the description.
 	'''
+	if not 'log' in locals():
+		wf = Workflow(update_settings = UPDATE_SETTINGS)
+		log = wf.logger
+
 	if DEBUG > 0:
 		log.debug('[ formatNotificationText() ] ')
 	notificationPriority, notificationTag, notificationBracketOpen, notificationBracketClose, notificationSeparator = '', '', '', '', ''
@@ -464,6 +333,9 @@ def formatDate(dateTime):
 ----------
 	@param datetime dateTime: The date time value.
 	'''
+	if not 'log' in locals():
+		wf = Workflow(update_settings = UPDATE_SETTINGS)
+		log = wf.logger
 	if DEBUG > 0:
 		log.debug('[ formatDate() ] ')
 	return dateTime.strftime('%Y-%m-%d %H:%M')
@@ -627,6 +499,139 @@ def getPriorityFromInput(query):
 		log.debug('inputPriority: ' + str(inputPriority))
 
 	return inputPriority
+
+def main(wf):
+	global query
+	# Check if there is a user input
+	if len(wf.args):
+		query = wf.args[0]
+	else:
+		query = None
+	if DEBUG > 0:
+		log.debug('[ main() ] - ' + query)
+
+	firstRun(wf3)
+	checkConfig(wf3)
+
+	# Evaluate input for description/content
+	global isDoNotDisplayCreate
+	if len(query.split(' :')) > 3: # Check if user is trying to add a second description - not possible
+		if DEBUG > 0:
+			log.debug('Attempted to define additional description.')
+		isDoNotDisplayCreate = True
+		wf3.add_item(title = 'Description already defined.', subtitle = 'Please remove the second \':\' defining a content.', valid = False,
+			# arg = 'cu ' + query + ' ',
+			autocomplete = query + ' ',
+			icon = ICON_WARNING)
+		wf3.send_feedback()
+
+	# Evaluate input for labels
+	for idx, labelIdentifier in enumerate(query.split(' #')):
+		hasAtLeastOneLabel = len(query.split(' #')) > 1
+		isLabelLastOne = idx == len(query.split(' #')) - 1
+		if hasAtLeastOneLabel and isLabelLastOne:
+			posFollowUpIdentifier = 0
+			posFollowUpList = labelIdentifier.find(' +')
+			posFollowUpTPriority = labelIdentifier.find(' !')
+			# Either + or ! may come directly after a #, so we only need to consider one
+			if posFollowUpList > -1: # Found match
+				posFollowUpIdentifier = posFollowUpList
+			elif posFollowUpTPriority > -1: # Found match
+				posFollowUpIdentifier = posFollowUpTPriority
+			if posFollowUpIdentifier:
+				labelIdentifier = labelIdentifier[0:posFollowUpIdentifier] # Extract text from # until +/!
+				log.debug(labelIdentifier[0:posFollowUpIdentifier])
+			else: # End of string
+				labelIdentifier = labelIdentifier[0:len(labelIdentifier)]
+				log.debug(labelIdentifier[0:len(labelIdentifier)])
+			if DEBUG > 1:
+				log.debug('labelIdentifier: ' + str(labelIdentifier))
+				log.debug(labelIdentifier)
+			if not posFollowUpIdentifier: # Only if tag is at the end of input, not if followed by other command-characters such as +/!
+				getLabels(labelIdentifier)
+
+	# Evaluate input for priorities
+	if len(query.split(' !')) < 3: # Check if user is trying to add a second priority - not possible
+		for idx, priorityIdentifier in enumerate(query.split(' !')): # No priority yet entered, suggest.
+			posFollowUpIdentifier = 0
+			hasAtLeastOnePriority = len(query.split(' !')) > 1
+			if hasAtLeastOnePriority:
+				posFollowUpTag = priorityIdentifier.find(' #') # If a tag follows after a list definition, treat it as end of string.
+				if posFollowUpTag > -1:
+					posFollowUpIdentifier = posFollowUpTag
+				if posFollowUpIdentifier:
+					priorityIdentifier = priorityIdentifier[0:posFollowUpIdentifier]
+					log.debug(priorityIdentifier[0:posFollowUpIdentifier])
+				if not posFollowUpIdentifier:
+					getPriorities(priorityIdentifier)
+	else:
+		if DEBUG > 0:
+			log.debug('Attempted to define additional priority.')
+		isDoNotDisplayCreate = True
+		wf3.add_item(title = 'Priority already defined.', subtitle = 'Please remove the second \'!\' defining a priority.', valid = False,
+			#arg = 'cu ' + query + ' ',
+			autocomplete = query + ' ',
+			icon = ICON_WARNING)
+		wf3.send_feedback()
+
+	# Evaluate input for lists
+	if len(query.split(' +')) < 3:
+		for idx, listIdentifier in enumerate(query.split(' +')): # No list yet entered, suggest.
+			if idx > 0: # Start from 1, as 0 is everything to the left of +
+				posFollowUpIdentifier = 0
+				# Lists are different from Labels/Priorities, as they might have spaces. To prevent calling getLists() if the user entered e.g. 'cu Title +My List With Spaces #x' to select label x - as calling getLists() would add secondary JSON output -, we stop when we find #/!.
+				# If +List is followed by either #Tag or !Priority, only extract list name from + until #/!.
+				hasAtLeastOneList = len(query.split(' +')) > 1
+				if hasAtLeastOneList:
+					posFollowUpTag = listIdentifier.find(' #')
+					posFollowUpTPriority = listIdentifier.find(' !')
+					# Either # or ! may come directly after a !, so we only need to consider one
+					if DEBUG > 1:
+						log.debug('listIdentifier:')
+					if posFollowUpTag > -1: # Found match
+						posFollowUpIdentifier = posFollowUpTag
+					elif posFollowUpTPriority > -1:
+						posFollowUpIdentifier = posFollowUpTPriority
+					if posFollowUpIdentifier:
+						listIdentifier = listIdentifier[0:posFollowUpIdentifier] # Extract text from + until #/!
+						log.debug(listIdentifier[0:posFollowUpIdentifier])
+					else:
+						listIdentifier = listIdentifier[0:len(listIdentifier)]
+						log.debug(listIdentifier[0:len(listIdentifier)])
+				if not posFollowUpIdentifier and hasAtLeastOneList:
+					getLists(listIdentifier, True)
+				elif hasAtLeastOneList: # Get lists from API or from cache, to update availableistsIdName/availableListsNameId for passing the Id to createTask.py. Do not generate list items. As the user can only select a single list, this is not an issue of unnecessary API calls - if the user attempts to add another one, we will not callout and instead fall back to the default list. Lists will not be displayed.
+					getLists(listIdentifier, False)
+	else:
+		if DEBUG > 0:
+			log.debug('Attempted to define additional list.')
+		isDoNotDisplayCreate = True
+		wf3.add_item(title = 'List already defined.', subtitle = 'Please remove the second \'+\' defining a list.', valid = False,
+			# arg = 'cu ' + query + ' ',
+			autocomplete = query + ' ',
+			icon = ICON_WARNING)
+		wf3.send_feedback()
+
+	# Extract different parts from input
+	inputName = getNameFromInput(query)
+	inputContent = getContentFromInput(query)
+	inputTags = getTagsFromInput(query)
+	inputDue = getDueFromInput(query)
+	inputList = getListFromInput(query)
+	inputPriority = getPriorityFromInput(query)
+
+
+	# Show 'Create Task' if user has completed their input - and no previous list item has been generated (JSON garbage).
+	inputEndsWithCommand = query[-2:] == ' #' or query[-2:] == ' !' or query[-2:] == ' +'
+	# log.debug('createListItemNotification - conditions: ')
+	# log.debug('inputEndsWithCommand: ' + str(inputEndsWithCommand))
+	# log.debug('doNotDisplayCreate: ' + str(isDoNotDisplayCreate))
+	# log.debug('hasFoundMatch: ' + str(hasFoundMatch))
+	# log.debug('isCustomTagEntered: ' + str(isCustomTagEntered))
+	if not inputEndsWithCommand and not isDoNotDisplayCreate and (not hasFoundMatch or isCustomTagEntered):
+		addCreateTaskItem(inputName, inputContent, inputDue, inputPriority, inputTags, inputList)
+		checkUpdates(wf3) # Output *after* 'Create Task', so user is not pestered by the notiifcation when trying to create a task
+		wf3.send_feedback()
 
 
 if __name__ == "__main__":
