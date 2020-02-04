@@ -11,7 +11,7 @@ import argparse
 import os
 from workflow import Workflow, Workflow3, ICON_WEB, ICON_CLOCK, ICON_WARNING, ICON_GROUP, web, PasswordNotFound
 
-confNames = {'confApi': 'apiKey', 'confDue': 'dueDate', 'confList': 'list', 'confSpace': 'space', 'confTeam': 'team', 'confProject': 'project', 'confNotification': 'notification', 'confDefaultTag': 'defaultTag', 'confHierarchyLimit': 'hierarchyLimit'}
+confNames = {'confApi': 'apiKey', 'confDue': 'dueDate', 'confList': 'list', 'confSpace': 'space', 'confTeam': 'workspace', 'confProject': 'folder', 'confNotification': 'notification', 'confDefaultTag': 'defaultTag', 'confHierarchyLimit': 'hierarchyLimit'}
 
 
 def main(wf):
@@ -45,10 +45,10 @@ def configuration():
 
 		wf3.add_item(title = 'Set API key' + (' (' + apiKeyValue + ')' if apiKeyValue else ''), subtitle = 'Your personal ClickUp API key/token.', valid = False, autocomplete = confNames['confApi'] + ' ')
 		wf3.add_item(title = 'Set default due date' + (' (' + dueValue + ')' if dueValue else ''), subtitle = 'e.g. m30 (in 30 minutes), h2 (in two hours), d1 (in one day), w1 (in one week)', valid = False, autocomplete = confNames['confDue'] + ' ')
-		wf3.add_item(title = 'Set default ClickUp list' + (' (' + listValue + ')' if listValue else ''), subtitle = 'List you want to add tasks to by default', valid = False, autocomplete = confNames['confList'] + ' ')
+		wf3.add_item(title = 'Set ClickUp workspace' + (' (' + teamValue + ')' if teamValue else ''), subtitle = 'Workspace that defines which tasks can be searched', valid = False, autocomplete = confNames['confTeam'] + ' ')
 		wf3.add_item(title = 'Set ClickUp space' + (' (' + spaceValue + ')' if spaceValue else ''), subtitle = 'Space that defines your available labels and priorities', valid = False, autocomplete = confNames['confSpace'] + ' ')
-		wf3.add_item(title = 'Set ClickUp team' + (' (' + teamValue + ')' if teamValue else ''), subtitle = 'Team that defines which tasks can be searched', valid = False, autocomplete = confNames['confTeam'] + ' ')
-		wf3.add_item(title = 'Set ClickUp project' + (' (' + projectValue + ')' if projectValue else ''), subtitle = 'Project that which tasks can be searched. The project must be part of the team.', valid = False, autocomplete = confNames['confProject'] + ' ')
+		wf3.add_item(title = 'Set ClickUp folder' + (' (' + projectValue + ')' if projectValue else ''), subtitle = 'Folder that which tasks can be searched. The Folder must be part of the workspace.', valid = False, autocomplete = confNames['confProject'] + ' ')
+		wf3.add_item(title = 'Set default ClickUp list' + (' (' + listValue + ')' if listValue else ''), subtitle = 'List you want to add tasks to by default', valid = False, autocomplete = confNames['confList'] + ' ')
 		wf3.add_item(title = 'Set Show Notification' + (' (' + notificationValue + ')' if notificationValue else ''), subtitle = 'Show notification after creating task?', valid = False, autocomplete = confNames['confNotification'] + ' ')
 		wf3.add_item(title = 'Set default Tag' + (' (' + defaultTagValue + ')' if defaultTagValue else ''), subtitle = 'Tag that is added to all new tasks.', valid = False, autocomplete = confNames['confDefaultTag'] + ' ')
 		wf3.add_item(title = 'Set hierarchy levels to limit search results' + (' (' + hierarchyLimitValue + ')' if hierarchyLimitValue else ''), subtitle = 'Levels to lmit search results by (list, folder, space).', valid = False, autocomplete = confNames['confHierarchyLimit'] + ' ')
@@ -92,13 +92,13 @@ def configuration():
 		userInput = query.replace(confNames['confTeam'] + ' ', '')
 		if not userInput.isnumeric() or len(userInput) != 7:
 			userInput = '(Invalid input).'
-		teamItem = wf3.add_item(title = 'Enter team (Id): ' + userInput, subtitle = 'Save?', valid = True, arg = 'cu:config ' + query)
+		teamItem = wf3.add_item(title = 'Enter workspace (Id): ' + userInput, subtitle = 'Save?', valid = True, arg = 'cu:config ' + query)
 		teamItem.setvar('isSubmitted', 'true')
 	elif query.startswith(confNames['confProject'] + ' '):
 		userInput = query.replace(confNames['confProject'] + ' ', '')
 		if not userInput.isnumeric() or len(userInput) != 7:
 			userInput = '(Invalid input).'
-		projectItem = wf3.add_item(title = 'Enter project (Id): ' + userInput, subtitle = 'Save?', valid = True, arg = 'cu:config ' + query)
+		projectItem = wf3.add_item(title = 'Enter folder (Id): ' + userInput, subtitle = 'Save?', valid = True, arg = 'cu:config ' + query)
 		projectItem.setvar('isSubmitted', 'true')
 	elif query.startswith(confNames['confDefaultTag'] + ' '):
 		userInput = query.replace(confNames['confDefaultTag'] + ' ', '')

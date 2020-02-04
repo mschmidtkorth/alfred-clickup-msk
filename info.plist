@@ -561,25 +561,6 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>externaltriggerid</key>
-				<string></string>
-				<key>passinputasargument</key>
-				<true/>
-				<key>passvariables</key>
-				<true/>
-				<key>workflowbundleid</key>
-				<string>self</string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.output.callexternaltrigger</string>
-			<key>uid</key>
-			<string>E5BAD5D5-C495-446D-9BB7-E12559856C91</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>browser</key>
 				<string></string>
 				<key>spaces</key>
@@ -1149,13 +1130,6 @@ Uses fuzzy search instead of Alfred filtering.</string>
 			<integer>60</integer>
 			<key>ypos</key>
 			<integer>395</integer>
-		</dict>
-		<key>E5BAD5D5-C495-446D-9BB7-E12559856C91</key>
-		<dict>
-			<key>xpos</key>
-			<integer>770</integer>
-			<key>ypos</key>
-			<integer>380</integer>
 		</dict>
 		<key>E6C3021D-536B-4C06-8C56-4623EB1AC8CF</key>
 		<dict>
