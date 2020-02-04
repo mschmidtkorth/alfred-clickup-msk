@@ -10,6 +10,7 @@ This workflow allows you to use Alfred to quickly add tasks and search tasks wit
 	- [Configuration](#configuration)
 	- [Usage & Commands](#usage--commands)
 		- [Creating Tasks](#creating-tasks)
+			- [Examples](#examples)
 		- [Searching Tasks](#searching-tasks)
 		- [Listing Created Tasks](#listing-created-tasks)
 	- [How to Contribute](#how-to-contribute)
@@ -51,6 +52,8 @@ You can validate all parameters via `cu:config validate`. This should be your fi
 ## Usage & Commands
 
 ### Creating Tasks
+![Creating a task](docs/ClickUp.gif)
+
 Tasks can be created by providing a title and optional commands.
 
 ```
@@ -81,13 +84,7 @@ Commands let you add additional information to your task:
 - *Caveat*: If you want to use `@`, `!` or `+` in either title or content, do not use a space before. Otherwise the character will be identified as a command signifier.
 
 
-cu Clean kitchen #housework @h4 !1
-
-
-![Creating a task](docs/ClickUp.gif)
-
-
-Examples
+#### Examples
 
 ```
 cu Clean the kitchen :Before my wife gets angry #Housework @h4 !1
