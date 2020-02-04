@@ -1,0 +1,10 @@
+*.pyo
+*.pyc
+*.svg
+*.tmp
+*.dist-info
+_backup/*
+setup.py
+automatedTests.py
+DO_NOT_COMMIT.md
+workflow/.alfredversionchecked
