@@ -1160,7 +1160,7 @@ Uses fuzzy search instead of Alfred filtering.</string>
 	<key>variablesdontexport</key>
 	<array/>
 	<key>version</key>
-	<string>1.0.2</string>
+	<string>1.0.3</string>
 	<key>webaddress</key>
 	<string>https://github.com/mschmidtkorth/alfred-clickup-msk/</string>
 </dict>
