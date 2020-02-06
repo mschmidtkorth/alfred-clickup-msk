@@ -57,7 +57,7 @@ def configuration():
 		clearCache.setvar('isSubmitted', 'true') # No secondary screen necessary
 	elif query.startswith(confNames['confApi'] + ' '): # Check for suffix ' ' which we add automatically so user can type immediately
 		userInput = query.replace(confNames['confApi'] + ' ', '')
-		apiItem = wf3.add_item(title = 'Enter API key: ' + userInput, subtitle = 'Confirm to save to keychain?', valid = False, arg = 'cu:config ' + query)
+		apiItem = wf3.add_item(title = 'Enter API key: ' + userInput, subtitle = 'Confirm to save to keychain?', valid = True, arg = 'cu:config ' + query)
 		apiItem.setvar('isSubmitted', 'true')
 	elif query.startswith(confNames['confDue'] + ' '):
 		userInput = query.replace(confNames['confDue'] + ' ', '')
