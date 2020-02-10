@@ -22,7 +22,7 @@ def main(wf):
 		query = wf.args[0]
 	else:
 		query = None
-
+	
 	taskParameters = json.loads(query)
 	createTask(taskParameters['inputName'], taskParameters['inputContent'], taskParameters['inputDue'], taskParameters['inputPriority'], taskParameters['inputTags'], taskParameters['inputList'])
 
@@ -40,16 +40,20 @@ def createTask(inputName, inputContent, inputDue, inputPriority, inputTags, inpu
 	'''
 	if DEBUG > 0:
 		log.debug('[ Calling API to create task ]')
-
+	
 	if not inputList:
 		inputListId = getConfigValue(confNames['confList'])
 	else:
 		# Get value of first key in dictionary {Name, Id} by converting to List. The dict will always contain a single list name+Id the user specified.
 		inputListId = next(iter(inputList.items()))[1] # Get value for first key of dict
-
-	inputDue = datetime.datetime.strptime(str(inputDue)[:len(inputDue) - 10], '%Y-%m-%d %H:%M') # Convert String to datetime. Remove seconds.milliseconds (e.g. :26.614286) from string
-	inputDueMs = (inputDue - datetime.datetime.fromtimestamp(0)).total_seconds() * 1000.0 # Convert datetime into ms. Use fromtimestamp() to get local timezone instead of utcfromtimestamp()
-
+	
+	log.debug(inputDue)
+	log.debug(inputDue)
+	log.debug(inputDue)
+	if inputDue != 'None':
+		inputDue = datetime.datetime.strptime(str(inputDue)[:len(inputDue) - 10], '%Y-%m-%d %H:%M') # Convert String to datetime. Remove seconds.milliseconds (e.g. :26.614286) from string
+		inputDueMs = (inputDue - datetime.datetime.fromtimestamp(0)).total_seconds() * 1000.0 # Convert datetime into ms. Use fromtimestamp() to get local timezone instead of utcfromtimestamp()
+	
 	url = 'https://api.clickup.com/api/v2/list/' + inputListId + '/task'
 	params = None
 	headers = {}
@@ -58,16 +62,17 @@ def createTask(inputName, inputContent, inputDue, inputPriority, inputTags, inpu
 	data = {}
 	data['name'] = inputName
 	data['content'] = inputContent
-	data['due_date'] = int(inputDueMs)
-	data['due_date_time'] = True # Translated into true
+	if inputDue != 'None':
+		data['due_date'] = int(inputDueMs)
+		data['due_date_time'] = True # Translated into true
 	data['priority'] = inputPriority if inputPriority != None else None # Translated into 'null'
 	data['tags'] = inputTags
-
+	
 	if DEBUG > 1:
 		log.debug(url)
 		log.debug(headers)
 		log.debug(data)
-
+	
 	try:
 		import json
 		request = web.post(url, params = params, data = json.dumps(data), headers = headers)
@@ -80,7 +85,7 @@ def createTask(inputName, inputContent, inputDue, inputPriority, inputTags, inpu
 	result = request.json()
 	if DEBUG > 1:
 		log.debug('Response: ' + str(result))
-
+	
 	# If user pressed 'opt' (optInput == true), we do not want to show a notification, as the task is opened in the browser
 	hasUserNotPressedOpt = 'optInput' not in os.environ or os.environ['optInput'] == 'false'
 	if getConfigValue(confNames['confNotification']) == 'true' and (hasUserNotPressedOpt):
