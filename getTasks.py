@@ -32,12 +32,13 @@ def getTasks():
 	url = 'https://api.clickup.com/api/v2/team/' + getConfigValue(confNames['confTeam']) + '/task'
 	params = {}
 
-	if 'space' in getConfigValue(confNames['confHierarchyLimit']):
-		params['space_ids[]'] = getConfigValue(confNames['confSpace']) # Use [] instead of %5B%5D
-	if 'folder' in getConfigValue(confNames['confHierarchyLimit']):
-		params['project_ids[]'] = getConfigValue(confNames['confProject'])
-	if 'list' in getConfigValue(confNames['confHierarchyLimit']):
-		params['list_ids[]'] = getConfigValue(confNames['confList'])
+	if getConfigValue(confNames['confHierarchyLimit']):
+		if 'space' in getConfigValue(confNames['confHierarchyLimit']):
+			params['space_ids[]'] = getConfigValue(confNames['confSpace']) # Use [] instead of %5B%5D
+		if 'folder' in getConfigValue(confNames['confHierarchyLimit']):
+			params['project_ids[]'] = getConfigValue(confNames['confProject'])
+		if 'list' in getConfigValue(confNames['confHierarchyLimit']):
+			params['list_ids[]'] = getConfigValue(confNames['confList'])
 	params['order_by'] = 'due_date'
 	# Differentiates between listing all Alfred-created tasks and searching for all tasks (any)
 	if DEBUG > 0 and len(wf.args) > 1 and wf.args[1] == 'search':

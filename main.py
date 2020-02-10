@@ -35,6 +35,7 @@ hasFoundMatch = False
 isDoNotDisplayCreate = False
 isCustomTagEntered = False
 
+
 def retrieveLabelsFromAPI():
 	'''Retrieves list of available Labels from ClickUp.
 	'''
@@ -125,10 +126,13 @@ def getPriorities(input):
 		filteredItems = wf.filter(input, allLabelTitles)
 		for item in filteredItems:
 			hasFoundMatch = True
-			wf3.add_item(title = item.split(' ')[1], valid = False,
+			wf3.add_item(
+				title = item.split(' ')[1],
+				valid = False,
 				#arg = 'cu ' + query.replace(input, '') + str(priority) + ' ',
 				autocomplete = query.replace(input, '') + item.split(' ')[0] + ' ',
-				icon = './prio' + item.split(' ')[0] + '.png')
+				icon = './prio' + item.split(' ')[0] + '.png'
+			)
 	if hasFoundMatch:
 		wf3.send_feedback()
 
@@ -190,10 +194,13 @@ def getLists(input, doPrintResults):
 		global hasFoundMatch
 		for item in filteredItems:
 			hasFoundMatch = True
-			wf3.add_item(title = item, valid = False,
+			wf3.add_item(
+				title = item,
+				valid = False,
 				#arg = 'cu ' + query.replace(input, '') + item + ' ',
 				autocomplete = query.replace(input, '') + item + ' ',
-				icon = './note.png')
+				icon = './note.png'
+			)
 		if doPrintResults and hasFoundMatch:
 			wf3.send_feedback()
 	else: # Even when nothing is entered, we need to fill our dictionaries.
@@ -319,12 +326,16 @@ def formatNotificationText(inputContent, inputDue, inputTags, inputPriority, ava
 		notificationBracketClose = ')'
 	if inputPriority != None and hasTags:
 		notificationSeparator = ', '
+	if inputDue and inputDue != 'None':
+		inputDue = emoji.emojize(':calendar:') + formatDate(inputDue)
+	else:
+		inputDue = ''
 
 	br = ''
 	if lineBreaks:
 		br = '\n'
 
-	return inputContent + ('  ' if inputContent != '' else '') + br + emoji.emojize(':calendar:') + formatDate(inputDue) + notificationBracketOpen + notificationPriority + notificationSeparator + notificationTag + ' ' + (emoji.emojize(':spiral_notepad:') + str(next(iter(availableListsIdName))) if availableListsIdName != None else '') + notificationBracketClose
+	return inputContent + ('  ' if inputContent != '' else '') + br + inputDue + notificationBracketOpen + notificationPriority + notificationSeparator + notificationTag + ' ' + (emoji.emojize(':spiral_notepad:') + str(next(iter(availableListsIdName))) if availableListsIdName != None else '') + notificationBracketClose
 
 
 def formatDate(dateTime):
@@ -411,6 +422,7 @@ def getDueFromInput(query):
 	inputMinHourDayWeek = ''
 	passedDue = ''
 	isUseDefault = True
+	isNoDueDate = False
 	hasTime = len(query.split(' @', 2)) > 1
 	hasDefault = (getConfigValue(confNames['confDue']) != None and getConfigValue(confNames['confDue']) != '')
 	if hasTime or hasDefault:
@@ -426,11 +438,15 @@ def getDueFromInput(query):
 				passedDue = getConfigValue(confNames['confDue']) if isUseDefault else query.split(' @')[1][1:].split(' ')[0]
 				log.debug('passedDue: ' + str(passedDue))
 
-		inputMinHourDayWeek = getConfigValue(confNames['confDue'])[0] if isUseDefault else query.split(' @', 2)[1][0] # First character: m, h, d, w
+		inputMinHourDayWeek = ''
+		if (isUseDefault and getConfigValue(confNames['confDue'])):
+			inputMinHourDayWeek = getConfigValue(confNames['confDue'])[0]
+		elif len(query.split(' @', 2)[1]) > 0:
+			inputMinHourDayWeek = query.split(' @', 2)[1][0] # First character: m, h, d, w
 		if DEBUG > 1:
 			log.debug('inputMinHourDayWeek: ' + str(inputMinHourDayWeek))
 
-		isDefaultInteger = int(getConfigValue(confNames['confDue'])[1:])
+		isDefaultInteger = getConfigValue(confNames['confDue']) and int(getConfigValue(confNames['confDue'])[1:])
 		if hasTime:
 			isInputInteger = timeValue.isnumeric() #query.split(' @', 2)[1].strip()[1:].isnumeric()
 		if isUseDefault and isDefaultInteger:
@@ -438,7 +454,8 @@ def getDueFromInput(query):
 		elif isInputInteger:
 			inputDue = int(timeValue) #int(query.split(' @', 2)[1].strip()[1:])
 		else: # Invalid input
-			inputDue = 2
+			inputDue = 0 # No longer default of 2h - can now be set via configuration if desired, if not no due date will be added
+			isNoDueDate = True
 			inputMinHourDayWeek = 'h'
 
 		if inputMinHourDayWeek == 'm':
@@ -450,12 +467,16 @@ def getDueFromInput(query):
 		elif inputMinHourDayWeek == 'w':
 			inputDue *= 1000 * 60 * 60 * 24 * 7
 	else:
-		inputDue = 2 * 1000 * 60 * 60 # Default in 2 hours if no other value specified and no default context variable specified
+		inputDue = 0 # No longer default of 2h if no other value specified and no default context variable specified - can now be set via configuration if desired, if not no due date will be added
+		isNoDueDate = True
 	inputDue = datetime.datetime.now() + datetime.timedelta(milliseconds = inputDue) # Add to whatever buffer has been selected
 	if DEBUG > 1:
 		log.debug('inputDue: ' + str(inputDue))
 
-	return inputDue
+	if isNoDueDate:
+		return None
+	else:
+		return inputDue
 
 
 def getListFromInput(query):
@@ -500,6 +521,7 @@ def getPriorityFromInput(query):
 
 	return inputPriority
 
+
 def main(wf):
 	global query
 	# Check if there is a user input
@@ -519,10 +541,14 @@ def main(wf):
 		if DEBUG > 0:
 			log.debug('Attempted to define additional description.')
 		isDoNotDisplayCreate = True
-		wf3.add_item(title = 'Description already defined.', subtitle = 'Please remove the second \':\' defining a content.', valid = False,
+		wf3.add_item(
+			title = 'Description already defined.',
+			subtitle = 'Please remove the second \':\' defining a content.',
+			valid = False,
 			# arg = 'cu ' + query + ' ',
 			autocomplete = query + ' ',
-			icon = ICON_WARNING)
+			icon = ICON_WARNING
+		)
 		wf3.send_feedback()
 
 	# Evaluate input for labels
@@ -568,10 +594,14 @@ def main(wf):
 		if DEBUG > 0:
 			log.debug('Attempted to define additional priority.')
 		isDoNotDisplayCreate = True
-		wf3.add_item(title = 'Priority already defined.', subtitle = 'Please remove the second \'!\' defining a priority.', valid = False,
+		wf3.add_item(
+			title = 'Priority already defined.',
+			subtitle = 'Please remove the second \'!\' defining a priority.',
+			valid = False,
 			#arg = 'cu ' + query + ' ',
 			autocomplete = query + ' ',
-			icon = ICON_WARNING)
+			icon = ICON_WARNING
+		)
 		wf3.send_feedback()
 
 	# Evaluate input for lists
@@ -606,10 +636,14 @@ def main(wf):
 		if DEBUG > 0:
 			log.debug('Attempted to define additional list.')
 		isDoNotDisplayCreate = True
-		wf3.add_item(title = 'List already defined.', subtitle = 'Please remove the second \'+\' defining a list.', valid = False,
+		wf3.add_item(
+			title = 'List already defined.',
+			subtitle = 'Please remove the second \'+\' defining a list.',
+			valid = False,
 			# arg = 'cu ' + query + ' ',
 			autocomplete = query + ' ',
-			icon = ICON_WARNING)
+			icon = ICON_WARNING
+		)
 		wf3.send_feedback()
 
 	# Extract different parts from input
@@ -619,7 +653,6 @@ def main(wf):
 	inputDue = getDueFromInput(query)
 	inputList = getListFromInput(query)
 	inputPriority = getPriorityFromInput(query)
-
 
 	# Show 'Create Task' if user has completed their input - and no previous list item has been generated (JSON garbage).
 	inputEndsWithCommand = query[-2:] == ' #' or query[-2:] == ' !' or query[-2:] == ' +'

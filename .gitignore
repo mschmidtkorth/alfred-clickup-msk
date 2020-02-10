@@ -8,3 +8,4 @@ setup.py
 automatedTests.py
 DO_NOT_COMMIT.md
 workflow/.alfredversionchecked
+*.code-workspace
