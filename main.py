@@ -411,20 +411,42 @@ def getTagsFromInput(query):
 	return inputTags
 
 
+def nextWeekday(d, weekday):
+	'''Returns date of next weekday - either in current week, or in next week if already passed.
+
+----------
+	@param datetime d: A datetime object to which the result is added.
+	@param int weekday: Number of the day in a week (0 = Monday, 1 = Tuesday etc.)
+	'''
+	days_ahead = weekday - d.weekday()
+	if days_ahead <= 0: # Target day already happened this week
+		days_ahead += 7
+
+	return d + datetime.timedelta(days_ahead)
+
+
 def getDueFromInput(query):
 	'''Retrieves the task due date from the user's input.
 
 ----------
 	@param str query: The user's input.
 	'''
+
 	if DEBUG > 0:
 		log.debug('[ getDueFromInput() ] ')
+
+	naturalLanguageWeekdays = {'mon': 0, 'monday': 0, 'tue': 1, 'tuesday': 1, 'wed': 2, 'wednesday': 2, 'thu': 3, 'thursday': 3, 'fri': 4, 'friday': 4, 'sat': 5, 'saturday': 5, 'sun': 6, 'sunday': 6}
+	naturalLanguageRelativeDays = {'tod': 0, 'today': 0, 'tom': 1, 'tomorrow': 1}
+	# 'in X days/weeks': Handled via dX/wx
+	# 'next mon': Same as 'mon'
+
 	inputMinHourDayWeek = ''
-	passedDue = ''
+	# passedDue = ''
 	isUseDefault = True
 	isNoDueDate = False
 	hasTime = len(query.split(' @', 2)) > 1
-	hasDefault = (getConfigValue(confNames['confDue']) != None and getConfigValue(confNames['confDue']) != '')
+	hasDefault = (getConfigValue(confNames['confDue']) is not None and getConfigValue(confNames['confDue']) != '')
+	naturalValue = ''
 	if hasTime or hasDefault:
 		inputDue = 0
 		hasTime = len(query.split(' @')) > 1
@@ -434,42 +456,85 @@ def getDueFromInput(query):
 
 		if hasTime and hasValue:
 			isUseDefault = False
-			if DEBUG > 1:
-				passedDue = getConfigValue(confNames['confDue']) if isUseDefault else query.split(' @')[1][1:].split(' ')[0]
-				log.debug('passedDue: ' + str(passedDue))
+			# if DEBUG > 1:
+			# 	passedDue = getConfigValue(confNames['confDue']) if isUseDefault else query.split(' @')[1][1:].split(' ')[0]
+			# 	log.debug('passedDue: ' + str(passedDue))
 
 		inputMinHourDayWeek = ''
 		if (isUseDefault and getConfigValue(confNames['confDue'])):
 			inputMinHourDayWeek = getConfigValue(confNames['confDue'])[0]
 		elif len(query.split(' @', 2)[1]) > 0:
-			inputMinHourDayWeek = query.split(' @', 2)[1][0] # First character: m, h, d, w
-		if DEBUG > 1:
-			log.debug('inputMinHourDayWeek: ' + str(inputMinHourDayWeek))
+			value = query.split(' @', 2)[1]
+			if value.split(' ')[0] in naturalLanguageWeekdays.keys(): # Get date of next x-day
+				naturalValue = nextWeekday(datetime.datetime.today(), naturalLanguageWeekdays[value.split(' ')[0].lower()])
+				if DEBUG > 1:
+					log.debug('Received weekday: ' + str(naturalValue))
+				log.debug(nextWeekday(datetime.datetime.today(), naturalLanguageWeekdays[value.split(' ')[0].lower()]))
+			elif value.split(' ')[0] in naturalLanguageRelativeDays.keys(): # Get date of today/tomorrow
+				naturalValue = datetime.datetime.today() + datetime.timedelta(naturalLanguageRelativeDays[value.split(' ')[0].lower()])
+				if DEBUG > 1:
+					log.debug('Received relative date: ' + str(naturalValue))
+				log.debug(datetime.datetime.today() + datetime.timedelta(naturalLanguageRelativeDays[value.split(' ')[0].lower()]))
+			elif re.search(r'\d{4}-\d?\d-\d?\d', value) or re.search(r'(:2[0-3]|[01]?[0-9])\.[0-5]?[0-9](\.[0-5]?[0-9])?', value): # Get date or date-time as specified
+				date = ''
+				dateTime = ''
+				if len(sys.argv) == 2 or len(sys.argv) == 3:
+					date = re.search(r'\d{4}-\d?\d-\d?\d', value) # Matches 2000-01-01
+				if len(sys.argv) == 3:
+					dateTime = re.search(r'(:2[0-3]|[01]?[0-9])\.[0-5]?[0-9](\.[0-5]?[0-9])?', value) # Matches 12:00:00 or 12:00 # TODO: Split on Space?
+				if date:
+					if DEBUG > 1:
+						log.debug('Found date: ' + str(date.group()))
+					try:
+						naturalValue = datetime.datetime.strptime(date.group() + 'T' + datetime.datetime.now().strftime("%H.%M.%S"), '%Y-%m-%dT%H.%M.%S') # Convert string 'date + current time' to dateTime.
+					except ValueError: # Incorrect format, e.g. 2020-01-1
+						naturalValue = ''
+						pass
+				if dateTime:
+					if DEBUG > 1:
+						log.debug('Found date time: ' + str(dateTime.group()))
+					theDate = str(datetime.datetime.today().strftime('%Y-%m-%d')) if not date else date.group()
+					if len(dateTime.group()) == 5 or len(dateTime.group()) == 8: # 12:00, 12:00:00
+						try:
+							time = dateTime.group() if len(dateTime.group()) != 8 else dateTime.group()[:5]
+							naturalValue = datetime.datetime.strptime(theDate + 'T' + time, '%Y-%m-%dT%H.%M')
+						except ValueError: # Incorrect format, e.g. used : instead of . for hour.min.sec
+							naturalValue = ''
+							pass
 
-		isDefaultInteger = getConfigValue(confNames['confDue']) and int(getConfigValue(confNames['confDue'])[1:])
-		if hasTime:
-			isInputInteger = timeValue.isnumeric() #query.split(' @', 2)[1].strip()[1:].isnumeric()
-		if isUseDefault and isDefaultInteger:
-			inputDue = int(getConfigValue(confNames['confDue'])[1:])
-		elif isInputInteger:
-			inputDue = int(timeValue) #int(query.split(' @', 2)[1].strip()[1:])
-		else: # Invalid input
-			inputDue = 0 # No longer default of 2h - can now be set via configuration if desired, if not no due date will be added
-			isNoDueDate = True
-			inputMinHourDayWeek = 'h'
+				# Note: If only time given, e.g. @20:00:00 - then I need to add the current date.
+			else:
+				inputMinHourDayWeek = value[0] # First character: m, h, d, w
+				if DEBUG > 1:
+					log.debug('inputMinHourDayWeek: ' + str(inputMinHourDayWeek))
+		if not naturalValue:
+			isDefaultInteger = getConfigValue(confNames['confDue']) and int(getConfigValue(confNames['confDue'])[1:])
+			if hasTime:
+				isInputInteger = timeValue.isnumeric() #query.split(' @', 2)[1].strip()[1:].isnumeric()
+			if isUseDefault and isDefaultInteger:
+				inputDue = int(getConfigValue(confNames['confDue'])[1:])
+			elif isInputInteger:
+				inputDue = int(timeValue) #int(query.split(' @', 2)[1].strip()[1:])
+			else: # Invalid input
+				inputDue = 0 # No longer default of 2h - can now be set via configuration if desired, if not no due date will be added
+				isNoDueDate = True
+				inputMinHourDayWeek = 'h'
 
-		if inputMinHourDayWeek == 'm':
-			inputDue *= 1000 * 60
-		elif inputMinHourDayWeek == 'h':
-			inputDue *= 1000 * 60 * 60
-		elif inputMinHourDayWeek == 'd':
-			inputDue *= 1000 * 60 * 60 * 24
-		elif inputMinHourDayWeek == 'w':
-			inputDue *= 1000 * 60 * 60 * 24 * 7
+			if inputMinHourDayWeek == 'm':
+				inputDue *= 1000 * 60
+			elif inputMinHourDayWeek == 'h':
+				inputDue *= 1000 * 60 * 60
+			elif inputMinHourDayWeek == 'd':
+				inputDue *= 1000 * 60 * 60 * 24
+			elif inputMinHourDayWeek == 'w':
+				inputDue *= 1000 * 60 * 60 * 24 * 7
 	else:
 		inputDue = 0 # No longer default of 2h if no other value specified and no default context variable specified - can now be set via configuration if desired, if not no due date will be added
 		isNoDueDate = True
-	inputDue = datetime.datetime.now() + datetime.timedelta(milliseconds = inputDue) # Add to whatever buffer has been selected
+	if not naturalValue:
+		inputDue = datetime.datetime.now() + datetime.timedelta(milliseconds = inputDue) # Add to whatever buffer has been selected
+	else:
+		inputDue = naturalValue
 	if DEBUG > 1:
 		log.debug('inputDue: ' + str(inputDue))
 

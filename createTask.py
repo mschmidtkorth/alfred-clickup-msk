@@ -51,7 +51,10 @@ def createTask(inputName, inputContent, inputDue, inputPriority, inputTags, inpu
 	log.debug(inputDue)
 	log.debug(inputDue)
 	if inputDue != 'None':
-		inputDue = datetime.datetime.strptime(str(inputDue)[:len(inputDue) - 10], '%Y-%m-%d %H:%M') # Convert String to datetime. Remove seconds.milliseconds (e.g. :26.614286) from string
+		if len(inputDue) == 26: # 2020-01-01T12:00:00.000000
+			inputDue = datetime.datetime.strptime(str(inputDue)[:len(inputDue) - 10], '%Y-%m-%d %H:%M') # Convert String to datetime. Remove seconds.milliseconds (e.g. :26.614286) from string
+		else: # 2020-01-01T12:00:00
+			inputDue = datetime.datetime.strptime(str(inputDue)[:len(inputDue)], '%Y-%m-%d %H:%M:%S')
 		inputDueMs = (inputDue - datetime.datetime.fromtimestamp(0)).total_seconds() * 1000.0 # Convert datetime into ms. Use fromtimestamp() to get local timezone instead of utcfromtimestamp()
 	
 	url = 'https://api.clickup.com/api/v2/list/' + inputListId + '/task'
