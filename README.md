@@ -30,8 +30,8 @@ Before being able to connect to ClickUp, certain parameters need to be configure
 
 The following parameters are *required*:
 
-| Configuration setting           | Description                                                                                                                                                                                                                                                                                                         | Example                |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| Configuration setting         | Description                                                                                                                                                                                                                                                                                                      | Example                |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
 | *ClickUp API key*             | API token generated in ClickUp (either a public token or a private SSO token). Allows us to connect to your ClickUp account.<br>Can be retrieved from *ClickUp app > Profile Icon (bottom left) > Apps > Generate API key*<br> *Note:* Treat this key as your password. It will be stored in the MacOS Keychain. | `pk_12345_sdhu2348...` |
 | *Id for ClickUp Workspace*    | Id of the Workspace your tasks reside in.                                                                                                                                                                                                                                                                        | `2181159`              |
 | *Id for ClickUp Space*        | Id of the Space that defines your available Labels and Priorities.                                                                                                                                                                                                                                               | `2288348`              |
@@ -42,10 +42,10 @@ The following parameters are *required*:
 
 The following parameters are *optional*:
 
-| Configuration setting                        | Description                                                                                                                                                                                                                                                                                                                                | Example       |
-| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| Configuration setting                      | Description                                                                                                                                                                                                                                                                                                                             | Example       |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
 | *Id for ClickUp Folder*                    | Id of the Folder your List is part of.                                                                                                                                                                                                                                                                                                  | `2844542`     |
-| *Default Due Date*                         | If no Due date is specified when creating a task (via `@`), this Due date is used.                                                                                                                                                                                                                                                      | `h2`          |
+| *Default Due Date*                         | If no Due date is specified when creating a task (via `@`), this Due date is used. Otherwise, no due date is set.                                                                                                                                                                                                                       | `h2`          |
 | *Hierarchy Levels to limit Search Results* | When searching (`cus`, `cul`) you can limit the tasks returned by Space, Folder, List or a combination of those. For example, limiting by `space,folder` would use the *Id for ClickUp Space* and *Id for ClickUp Folder* to limit the search results by. If you do not provide a value, all tasks for your Workspace will be returned. | `folder,list` |
 | *Show Notification*                        | Whether to show a notification after creating a task.                                                                                                                                                                                                                                                                                   | `true`        |
 
@@ -73,6 +73,12 @@ Commands let you add additional information to your task:
 		- `h<number>` Task is due in `<number>` hours
 		- `d<number>` Task is due in `<number>` days
 		- `w<number>` Task is due in `<number>` weeks
+		- `mon` or `monday` Task is due for next Monday (same for other days)
+		- `tod` or `today` Task is due for today
+		- `tom` or `tomorrow` Task is due for tomorrow
+		- `2020-12-31` Task is due on 2020-12-31 at the current time
+		- `2020-12-31 14.00` Task is due on 2020-12-31 at 2pm (*note:* Hours, minutes and seconds are separated via `.`, as `:` is used to define the task's description)
+		- `14.00` Task is due today at 2pm (*note:* Hours, minutes and seconds are separated via `.`, as `:` is used to define the task's description)
 	- `!` **Priority** of a task (max. 1 possible). A list of available priorities will be provided and can be filtered by typing e.g. `!1` or `!Urge`. If not specified, priority is Normal.
 		- `!1` Task has priority of Urgent
 		- `!2` Task has priority of High
