@@ -80,10 +80,10 @@ Commands let you add additional information to your task:
 		- `2020-12-31 14.00` Task is due on 2020-12-31 at 2pm (*note:* Hours, minutes and seconds are separated via `.`, as `:` is used to define the task's description)
 		- `14.00` Task is due today at 2pm (*note:* Hours, minutes and seconds are separated via `.`, as `:` is used to define the task's description)
 	- `!` **Priority** of a task (max. 1 possible). A list of available priorities will be provided and can be filtered by typing e.g. `!1` or `!Urge`. If not specified, priority is Normal.
-		- `!1` Task has priority of Urgent
-		- `!2` Task has priority of High
-		- `!3` Task has priority of Normal
-		- `!4` Task has priority of Low
+		- `!1` Task has a priority of Urgent
+		- `!2` Task has a priority of High
+		- `!3` Task has a priority of Normal
+		- `!4` Task has a priority of Low
 	- `+ `**List** a task is assigned to (max. 1 possible). A list of available lists (ha) will be provided and can be filtered by typing e.g. `+myLi`. If you do not specify a List, your default will be used. Lists are cached for 2 hours.
 - Commands are optional
 - Commands are separated by space
