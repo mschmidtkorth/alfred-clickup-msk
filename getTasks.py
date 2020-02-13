@@ -7,12 +7,9 @@
 #
 from __future__ import unicode_literals
 import sys
-import argparse
-import os
-import json
-import emoji
 import datetime
-from main import DEBUG, formatDate
+import emoji
+from main import DEBUG
 from workflow import Workflow, Workflow3, ICON_WEB, ICON_CLOCK, ICON_WARNING, ICON_GROUP, web
 from config import confNames, getConfigValue
 
@@ -31,7 +28,8 @@ def getTasks():
 		log.debug('[ Calling API to list tasks ]')
 	url = 'https://api.clickup.com/api/v2/team/' + getConfigValue(confNames['confTeam']) + '/task'
 	params = {}
-
+	wf3 = Workflow3()
+	
 	if getConfigValue(confNames['confHierarchyLimit']):
 		if 'space' in getConfigValue(confNames['confHierarchyLimit']):
 			params['space_ids[]'] = getConfigValue(confNames['confSpace']) # Use [] instead of %5B%5D
@@ -63,14 +61,13 @@ def getTasks():
 	result = request.json()
 	if DEBUG > 1:
 		log.debug('Response: ' + str(result))
-
-	wf3 = Workflow3()
+	
 	for task in result['tasks']:
 		tags = ''
 		if task['tags']:
 			for allTaskTags in task['tags']:
 				tags += allTaskTags['name'] + ' '
-
+		
 		wf3.add_item(
 			title = '[' + task['status']['status'] + '] ' + task['name'],
 			subtitle = (emoji.emojize(':calendar:') + \

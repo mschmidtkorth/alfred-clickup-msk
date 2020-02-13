@@ -11,7 +11,7 @@ import argparse
 import os
 from workflow import Workflow, Workflow3, ICON_WEB, ICON_CLOCK, ICON_WARNING, ICON_GROUP, web, PasswordNotFound
 
-confNames = {'confApi': 'apiKey', 'confDue': 'dueDate', 'confList': 'list', 'confSpace': 'space', 'confTeam': 'workspace', 'confProject': 'folder', 'confNotification': 'notification', 'confDefaultTag': 'defaultTag', 'confHierarchyLimit': 'hierarchyLimit'}
+confNames = {'confApi': 'apiKey', 'confDue': 'dueDate', 'confList': 'list', 'confSpace': 'space', 'confTeam': 'workspace', 'confProject': 'folder', 'confNotification': 'notification', 'confDefaultTag': 'defaultTag', 'confHierarchyLimit': 'hierarchyLimit', 'confUser': 'userId'}
 
 
 def main(wf):
@@ -27,7 +27,7 @@ def configuration():
 		query = wf.args[0]
 	else:
 		query = None
-
+	
 	if not query:
 		apiKeyValue = getConfigValue(confNames['confApi'])
 		dueValue = getConfigValue(confNames['confDue'])
@@ -42,7 +42,7 @@ def configuration():
 			notificationValue = '✗'
 		defaultTagValue = getConfigValue(confNames['confDefaultTag'])
 		hierarchyLimitValue = getConfigValue(confNames['confHierarchyLimit'])
-
+		
 		wf3.add_item(title = 'Set API key' + (' (' + apiKeyValue + ')' if apiKeyValue else ''), subtitle = 'Your personal ClickUp API key/token.', valid = False, autocomplete = confNames['confApi'] + ' ')
 		wf3.add_item(title = 'Set default due date' + (' (' + dueValue + ')' if dueValue else ''), subtitle = 'e.g. m30 (in 30 minutes), h2 (in two hours), d1 (in one day), w1 (in one week)', valid = False, autocomplete = confNames['confDue'] + ' ')
 		wf3.add_item(title = 'Set ClickUp workspace' + (' (' + teamValue + ')' if teamValue else ''), subtitle = 'Workspace that defines which tasks can be searched', valid = False, autocomplete = confNames['confTeam'] + ' ')
@@ -177,7 +177,7 @@ def getConfigValue(configName):
 			value = wf.settings[configName]
 		else:
 			value = None
-
+	
 	return value
 
 
@@ -198,7 +198,7 @@ def checkClickUpId(idType, configKey):
 	if DEBUG > 1:
 		log.debug(url)
 		log.debug(headers)
-
+	
 	# Use requests instead of Workflow.web, as web does not return the response in case of failure (only 401 NOT_AUTHORIZED, which is the same for API key failure or listId etc. failure)
 	import requests
 	request = requests.get(url, headers = headers)

@@ -7,13 +7,13 @@
 #
 from __future__ import unicode_literals
 import sys
-import argparse
+# import argparse
 import os
 import json
 import datetime
-from main import DEBUG, formatDate, formatNotificationText
+from main import DEBUG, formatNotificationText
 from config import confNames, getConfigValue
-from workflow import Workflow, ICON_WEB, ICON_CLOCK, ICON_WARNING, ICON_GROUP, web
+from workflow import Workflow, Workflow3, web
 from workflow.notify import notify
 
 
@@ -24,7 +24,39 @@ def main(wf):
 		query = None
 	
 	taskParameters = json.loads(query)
+	getCurrentUser()
 	createTask(taskParameters['inputName'], taskParameters['inputContent'], taskParameters['inputDue'], taskParameters['inputPriority'], taskParameters['inputTags'], taskParameters['inputList'])
+
+
+def getCurrentUser():
+	'''If not yet stored, retrieves the current user Id to assign tasks to by default (so they appear in Inbox).'''
+	if DEBUG > 0:
+		log.debug('[ Calling API to create task ]')
+	
+	if not getConfigValue(confNames['confUser']):
+		url = 'https://api.clickup.com/api/v2/user'
+		params = None
+		headers = {}
+		headers['Authorization'] = getConfigValue(confNames['confApi'])
+		headers['Content-Type'] = 'application/json'
+		
+		if DEBUG > 1:
+			log.debug(url)
+			log.debug(headers)
+		
+		try:
+			request = web.get(url, params = params, headers = headers)
+			request.raise_for_status()
+		except:
+			log.debug('Error on HTTP request')
+			wf3.add_item(title = 'Error connecting to ClickUp.', subtitle = 'Open configuration to check your parameters?', valid = True, arg = 'cu:config ', icon = 'error.png')
+			wf3.send_feedback()
+			exit()
+		result = request.json()
+		if DEBUG > 1:
+			log.debug('Response: ' + str(result))
+		
+		wf.settings['userId'] = result['user']['id']
 
 
 def createTask(inputName, inputContent, inputDue, inputPriority, inputTags, inputList):
@@ -47,9 +79,6 @@ def createTask(inputName, inputContent, inputDue, inputPriority, inputTags, inpu
 		# Get value of first key in dictionary {Name, Id} by converting to List. The dict will always contain a single list name+Id the user specified.
 		inputListId = next(iter(inputList.items()))[1] # Get value for first key of dict
 	
-	log.debug(inputDue)
-	log.debug(inputDue)
-	log.debug(inputDue)
 	if inputDue != 'None':
 		if len(inputDue) == 26: # 2020-01-01T12:00:00.000000
 			inputDue = datetime.datetime.strptime(str(inputDue)[:len(inputDue) - 10], '%Y-%m-%d %H:%M') # Convert String to datetime. Remove seconds.milliseconds (e.g. :26.614286) from string
@@ -68,8 +97,10 @@ def createTask(inputName, inputContent, inputDue, inputPriority, inputTags, inpu
 	if inputDue != 'None':
 		data['due_date'] = int(inputDueMs)
 		data['due_date_time'] = True # Translated into true
-	data['priority'] = inputPriority if inputPriority != None else None # Translated into 'null'
+	data['priority'] = inputPriority if inputPriority is not None else None # Translated into 'null'
 	data['tags'] = inputTags
+	if getConfigValue(confNames['confUser']): # Default assignee = current user
+		data['assignees'] = [getConfigValue(confNames['confUser'])]
 	
 	if DEBUG > 1:
 		log.debug(url)
@@ -92,7 +123,6 @@ def createTask(inputName, inputContent, inputDue, inputPriority, inputTags, inpu
 	# If user pressed 'opt' (optInput == true), we do not want to show a notification, as the task is opened in the browser
 	hasUserNotPressedOpt = 'optInput' not in os.environ or os.environ['optInput'] == 'false'
 	if getConfigValue(confNames['confNotification']) == 'true' and (hasUserNotPressedOpt):
-		dash = ' - ' if inputContent else ''
 		notify('Created: ' + inputName, formatNotificationText(inputContent, inputDue, inputTags, inputPriority, inputList, True))
 	elif os.environ['optInput'] and os.environ['optInput'] == 'true':
 		print(result['url'])
@@ -100,5 +130,6 @@ def createTask(inputName, inputContent, inputDue, inputPriority, inputTags, inpu
 
 if __name__ == "__main__":
 	wf = Workflow()
+	wf3 = Workflow3()
 	log = wf.logger
 	sys.exit(wf.run(main))
