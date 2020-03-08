@@ -10,11 +10,10 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import datetime
-import argparse
 import os
 import emoji
 import re
-from workflow import Workflow, Workflow3, ICON_WEB, ICON_CLOCK, ICON_WARNING, ICON_GROUP, ICON_SYNC, web, util # Alfred-Workflow
+from workflow import Workflow, Workflow3, ICON_CLOCK, ICON_WARNING, ICON_GROUP, ICON_SYNC, web, util # Alfred-Workflow
 from workflow.util import set_config, unset_config
 from workflow.update import Version
 from config import confNames, getConfigValue
@@ -58,7 +57,7 @@ def retrieveLabelsFromAPI():
 	result = request.json()
 	if DEBUG > 1:
 		log.debug('Response: ' + str(result))
-
+	
 	if 'tags' in result:
 		return result['tags']
 	else:
@@ -74,7 +73,7 @@ def getLabels(input):
 	if DEBUG > 0:
 		log.debug('[ Displaying labels ] - input: ' + input)
 	availableTags = wf.cached_data('availableLabels', retrieveLabelsFromAPI, max_age = 600) # Get data from cache or retrieve from API
-
+	
 	global query
 	global hasFoundMatch
 	# If user types 'test #123 ', we know that the tag has already been chosen - no need to display
@@ -97,7 +96,7 @@ def getLabels(input):
 	if not hasFoundMatch:
 		global isCustomTagEntered
 		isCustomTagEntered = True
-
+	
 	if hasFoundMatch:
 		wf3.send_feedback()
 
@@ -110,11 +109,11 @@ def getPriorities(input):
 	'''
 	if DEBUG > 0:
 		log.debug('[ Collecting priorities - input: ' + input + ']')
-
+	
 	global query
 	global hasFoundMatch
 	dicPriorities = {1: 'Urgent', 2: 'High', 3: 'Normal', 4: 'Low'} # Priorities cannot be customized by user. -1 = None, but must not be selectable.
-
+	
 	isUserEndedInput = query[-1] == ' '
 	if not isUserEndedInput:
 		#for priority in dicPriorities:
@@ -157,10 +156,10 @@ def retrieveListsFromAPI():
 		wf3.send_feedback()
 		exit()
 	result = request.json()
-
+	
 	if DEBUG > 1:
 		log.debug('Response: ' + str(result))
-
+	
 	return result['lists']
 
 
@@ -176,7 +175,7 @@ def getLists(input, doPrintResults):
 	global query
 	global availableLists
 	availableLists = wf.cached_data('availableLists', retrieveListsFromAPI, max_age = 7200)
-
+	
 	isUserEndedInput = query[-1] == ' '
 	if not isUserEndedInput and doPrintResults:
 		allListTitles = []
@@ -254,7 +253,7 @@ def checkUpdates(wf3):
 		if DEBUG > 0:
 			log.debug('Found workflow update.')
 		updateItem = wf3.add_item(title = 'New version available for your ClickUp workflow!', subtitle = 'Press "Enter" to install the update.', autocomplete = 'workflow:update', icon = ICON_SYNC)
-
+		
 		if query == 'workflow:update':
 			if DEBUG > 0:
 				log.debug('Updating workflow.')
@@ -274,7 +273,7 @@ def addCreateTaskItem(inputName, inputContent, inputDue, inputPriority, inputTag
 	'''
 	if DEBUG > 0:
 		log.debug('[ addCreateTaskItem() ]')
-
+	
 	import json
 	inputParameters = {'inputName': inputName, 'inputContent': inputContent, 'inputDue': str(inputDue), 'inputPriority': inputPriority, 'inputTags': inputTags}
 	inputParameters['inputList'] = None
@@ -282,7 +281,7 @@ def addCreateTaskItem(inputName, inputContent, inputDue, inputPriority, inputTag
 		if inputList in availableListsIdName:
 			# For display: Use Name. For passing to Create Task: Use Id.
 			inputParameters['inputList'] = {availableListsIdName[inputList]: inputList} # ListId : ListName
-
+	
 	outputTaskValues = json.dumps(inputParameters)
 	createTaskItem = wf3.add_item(
 		title = 'Create task "' + str(inputName).strip() + '"?',
@@ -307,7 +306,7 @@ def formatNotificationText(inputContent, inputDue, inputTags, inputPriority, ava
 	if not 'log' in locals():
 		wf = Workflow(update_settings = UPDATE_SETTINGS)
 		log = wf.logger
-
+	
 	if DEBUG > 0:
 		log.debug('[ formatNotificationText() ] ')
 	notificationPriority, notificationTag, notificationBracketOpen, notificationBracketClose, notificationSeparator = '', '', '', '', ''
@@ -330,11 +329,11 @@ def formatNotificationText(inputContent, inputDue, inputTags, inputPriority, ava
 		inputDue = emoji.emojize(':calendar:') + formatDate(inputDue)
 	else:
 		inputDue = ''
-
+	
 	br = ''
 	if lineBreaks:
 		br = '\n'
-
+	
 	return inputContent + ('  ' if inputContent != '' else '') + br + inputDue + notificationBracketOpen + notificationPriority + notificationSeparator + notificationTag + ' ' + (emoji.emojize(':spiral_notepad:') + str(next(iter(availableListsIdName))) if availableListsIdName != None else '') + notificationBracketClose
 
 
@@ -363,7 +362,7 @@ def getNameFromInput(query):
 	inputName = query.split(":", 1)[0].split(" #", 1)[0].split(" @", 1)[0].split(" !", 1)[0].split(" +", 1)[0].strip() # If it cannot be split, first element will be complete string
 	if DEBUG > 1:
 		log.debug('inputName: ' + str(inputName))
-
+	
 	return inputName
 
 
@@ -381,7 +380,7 @@ def getContentFromInput(query):
 		inputContent = query.split(':', 1)[1].split(' #', 1)[0].split(' @', 1)[0].split(' !', 1)[0].split(" +", 1)[0].strip().decode('utf-8') # Avoid adding #myTag, @due, !priority to the content text
 	if DEBUG > 1:
 		log.debug('inputContent: ' + str(inputContent))
-
+	
 	return inputContent
 
 
@@ -396,7 +395,7 @@ def getTagsFromInput(query):
 	inputTags = []
 	if getConfigValue(confNames['confDefaultTag']):
 		inputTags.append(getConfigValue(confNames['confDefaultTag']))
-
+	
 	# Find first occurrence of '#' - from here, retrieve labels.
 	if query.find(' #') > -1: # Char was found
 		# From first occurrence until end of input # [u'', u'123 ', u'456']
@@ -407,7 +406,7 @@ def getTagsFromInput(query):
 				inputTags.append(tagValue.strip())
 	if DEBUG > 1:
 		log.debug('inputTags: ' + str(inputTags))
-
+	
 	return inputTags
 
 
@@ -421,7 +420,7 @@ def nextWeekday(d, weekday):
 	days_ahead = weekday - d.weekday()
 	if days_ahead <= 0: # Target day already happened this week
 		days_ahead += 7
-
+	
 	return d + datetime.timedelta(days_ahead)
 
 
@@ -431,15 +430,15 @@ def getDueFromInput(query):
 ----------
 	@param str query: The user's input.
 	'''
-
+	
 	if DEBUG > 0:
 		log.debug('[ getDueFromInput() ] ')
-
+	
 	naturalLanguageWeekdays = {'mon': 0, 'monday': 0, 'tue': 1, 'tuesday': 1, 'wed': 2, 'wednesday': 2, 'thu': 3, 'thursday': 3, 'fri': 4, 'friday': 4, 'sat': 5, 'saturday': 5, 'sun': 6, 'sunday': 6}
 	naturalLanguageRelativeDays = {'tod': 0, 'today': 0, 'tom': 1, 'tomorrow': 1}
 	# 'in X days/weeks': Handled via dX/wx
 	# 'next mon': Same as 'mon'
-
+	
 	inputMinHourDayWeek = ''
 	# passedDue = ''
 	isUseDefault = True
@@ -453,13 +452,13 @@ def getDueFromInput(query):
 		if hasTime:
 			hasValue = len(query.split(' @')[1]) > 0 and query.split(' @')[1][0] != ' ' # [1] = First element in array (h3 (+ any text after)). [0] = First character of array (h). Ensure that first character is not a space, otherwise "cu Test @ someText" will be true
 			timeValue = query.split(' @')[1][1:].split(' ')[0] # cu Task @h2 some other text -> h2
-
+		
 		if hasTime and hasValue:
 			isUseDefault = False
 			# if DEBUG > 1:
 			# 	passedDue = getConfigValue(confNames['confDue']) if isUseDefault else query.split(' @')[1][1:].split(' ')[0]
 			# 	log.debug('passedDue: ' + str(passedDue))
-
+		
 		inputMinHourDayWeek = ''
 		if (isUseDefault and getConfigValue(confNames['confDue'])):
 			inputMinHourDayWeek = getConfigValue(confNames['confDue'])[0]
@@ -501,7 +500,7 @@ def getDueFromInput(query):
 						except ValueError: # Incorrect format, e.g. used : instead of . for hour.min.sec
 							naturalValue = ''
 							pass
-
+				
 				# Note: If only time given, e.g. @20:00:00 - then I need to add the current date.
 			else:
 				inputMinHourDayWeek = value[0] # First character: m, h, d, w
@@ -519,7 +518,7 @@ def getDueFromInput(query):
 				inputDue = 0 # No longer default of 2h - can now be set via configuration if desired, if not no due date will be added
 				isNoDueDate = True
 				inputMinHourDayWeek = 'h'
-
+			
 			if inputMinHourDayWeek == 'm':
 				inputDue *= 1000 * 60
 			elif inputMinHourDayWeek == 'h':
@@ -537,7 +536,7 @@ def getDueFromInput(query):
 		inputDue = naturalValue
 	if DEBUG > 1:
 		log.debug('inputDue: ' + str(inputDue))
-
+	
 	if isNoDueDate:
 		return None
 	else:
@@ -563,7 +562,7 @@ def getListFromInput(query):
 	if DEBUG > 1:
 		log.debug('inputList: ' + str(inputList))
 		log.debug(availableListsIdName)
-
+	
 	return inputList
 
 
@@ -583,7 +582,7 @@ def getPriorityFromInput(query):
 		inputPriority = int(query.split(' !', 2)[1].strip()[:1])
 	if DEBUG > 1:
 		log.debug('inputPriority: ' + str(inputPriority))
-
+	
 	return inputPriority
 
 
@@ -596,10 +595,10 @@ def main(wf):
 		query = None
 	if DEBUG > 0:
 		log.debug('[ main() ] - ' + query)
-
+	
 	firstRun(wf3)
 	checkConfig(wf3)
-
+	
 	# Evaluate input for description/content
 	global isDoNotDisplayCreate
 	if len(query.split(' :')) > 3: # Check if user is trying to add a second description - not possible
@@ -615,7 +614,7 @@ def main(wf):
 			icon = ICON_WARNING
 		)
 		wf3.send_feedback()
-
+	
 	# Evaluate input for labels
 	for idx, labelIdentifier in enumerate(query.split(' #')):
 		hasAtLeastOneLabel = len(query.split(' #')) > 1
@@ -640,7 +639,7 @@ def main(wf):
 				log.debug(labelIdentifier)
 			if not posFollowUpIdentifier: # Only if tag is at the end of input, not if followed by other command-characters such as +/!
 				getLabels(labelIdentifier)
-
+	
 	# Evaluate input for priorities
 	if len(query.split(' !')) < 3: # Check if user is trying to add a second priority - not possible
 		for idx, priorityIdentifier in enumerate(query.split(' !')): # No priority yet entered, suggest.
@@ -668,7 +667,7 @@ def main(wf):
 			icon = ICON_WARNING
 		)
 		wf3.send_feedback()
-
+	
 	# Evaluate input for lists
 	if len(query.split(' +')) < 3:
 		for idx, listIdentifier in enumerate(query.split(' +')): # No list yet entered, suggest.
@@ -710,7 +709,7 @@ def main(wf):
 			icon = ICON_WARNING
 		)
 		wf3.send_feedback()
-
+	
 	# Extract different parts from input
 	inputName = getNameFromInput(query)
 	inputContent = getContentFromInput(query)
@@ -718,7 +717,7 @@ def main(wf):
 	inputDue = getDueFromInput(query)
 	inputList = getListFromInput(query)
 	inputPriority = getPriorityFromInput(query)
-
+	
 	# Show 'Create Task' if user has completed their input - and no previous list item has been generated (JSON garbage).
 	inputEndsWithCommand = query[-2:] == ' #' or query[-2:] == ' !' or query[-2:] == ' +'
 	# log.debug('createListItemNotification - conditions: ')
