@@ -7,11 +7,9 @@
 #
 from __future__ import unicode_literals
 import sys
-import argparse
-import os
-from workflow import Workflow, Workflow3, ICON_WEB, ICON_CLOCK, ICON_WARNING, ICON_GROUP, web, PasswordNotFound
+from workflow import Workflow, Workflow3, ICON_WARNING, web, PasswordNotFound
 
-confNames = {'confApi': 'apiKey', 'confDue': 'dueDate', 'confList': 'list', 'confSpace': 'space', 'confTeam': 'workspace', 'confProject': 'folder', 'confNotification': 'notification', 'confDefaultTag': 'defaultTag', 'confHierarchyLimit': 'hierarchyLimit'}
+confNames = {'confApi': 'apiKey', 'confDue': 'dueDate', 'confList': 'list', 'confSpace': 'space', 'confTeam': 'workspace', 'confProject': 'folder', 'confNotification': 'notification', 'confDefaultTag': 'defaultTag', 'confHierarchyLimit': 'hierarchyLimit', 'confUser': 'userId'}
 
 
 def main(wf):
@@ -188,16 +186,10 @@ def checkClickUpId(idType, configKey):
 	@param str idType: The value to be used in the API URL.
 	@param str configKey: The name of the setting to be retrieved.
 	'''
-	if DEBUG > 0:
-		log.debug('[ Checking ' + idType + ' ' + getConfigValue(confNames[configKey]) + ' ]')
 	url = 'https://api.clickup.com/api/v2/' + idType + '/' + getConfigValue(confNames[configKey])
-	params = None
 	headers = {}
 	headers['Authorization'] = getConfigValue(confNames['confApi'])
 	headers['Content-Type'] = 'application/json'
-	if DEBUG > 1:
-		log.debug(url)
-		log.debug(headers)
 
 	# Use requests instead of Workflow.web, as web does not return the response in case of failure (only 401 NOT_AUTHORIZED, which is the same for API key failure or listId etc. failure)
 	import requests
