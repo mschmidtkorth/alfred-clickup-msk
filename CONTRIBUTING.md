@@ -5,8 +5,8 @@ I'm happy about any ideas, suggestions for enhancements or contributions of code
 If you think you have found a bug, please
 
 - Go to `cu:config validate` in Alfred to validate whether your ClickUp parameters are correct
-- Check that your bug has not already been [reported](https://github.com/mschmidtkorth/alfred-clickup-msk-test/issues)
-- Create a new GitHub [issue](https://github.com/mschmidtkorth/alfred-clickup-msk-test/issues/new) providing
+- Check that your bug has not already been [reported](https://github.com/mschmidtkorth/alfred-clickup-msk/issues)
+- Create a new GitHub [issue](https://github.com/mschmidtkorth/alfred-clickup-msk/issues/new) providing
 	- Your Alfred version
 	- Whether the bug is reproducible or occurs 'by chance'
 	- An explanation of the bug, providing the exact steps if it is reproducible
@@ -14,7 +14,7 @@ If you think you have found a bug, please
 	- Your debug log (open *Alfred Preferences > Workflows > ClickUp > press `⌘+D`* and copy all content from the bottom window)
 
 # Suggesting an Enhancement
-If you have an idea for a new feature, or an enhancement of an existing one, please raise a new GitHub [issue](https://github.com/mschmidtkorth/alfred-clickup-msk-test2/issues/new).
+If you have an idea for a new feature, or an enhancement of an existing one, please raise a new GitHub [issue](https://github.com/mschmidtkorth/alfred-clickup-msk/issues/new).
 
 # Contributing your Code
 If you already programmed a new feature or enhancement (awesome!), please
