@@ -25,7 +25,7 @@ def configuration():
 		query = wf.args[0]
 	else:
 		query = None
-
+	
 	if not query:
 		apiKeyValue = getConfigValue(confNames['confApi'])
 		dueValue = getConfigValue(confNames['confDue'])
@@ -40,7 +40,7 @@ def configuration():
 			notificationValue = '✗'
 		defaultTagValue = getConfigValue(confNames['confDefaultTag'])
 		hierarchyLimitValue = getConfigValue(confNames['confHierarchyLimit'])
-
+		
 		wf3.add_item(title = 'Set API key' + (' (' + apiKeyValue + ')' if apiKeyValue else ''), subtitle = 'Your personal ClickUp API key/token.', valid = False, autocomplete = confNames['confApi'] + ' ')
 		wf3.add_item(title = 'Set default due date' + (' (' + dueValue + ')' if dueValue else ''), subtitle = 'e.g. m30 (in 30 minutes), h2 (in two hours), d1 (in one day), w1 (in one week)', valid = False, autocomplete = confNames['confDue'] + ' ')
 		wf3.add_item(title = 'Set ClickUp workspace' + (' (' + teamValue + ')' if teamValue else ''), subtitle = 'Workspace that defines which tasks can be searched', valid = False, autocomplete = confNames['confTeam'] + ' ')
@@ -126,7 +126,8 @@ def configuration():
 		wf3.add_item(title = 'Checking List Id: ' + ('✓' if checkClickUpId('list', 'confList') else '✗'), valid = True, arg = 'cu:config ')
 		wf3.add_item(title = 'Checking Space Id: ' + ('✓' if checkClickUpId('space', 'confSpace') else '✗'), valid = True, arg = 'cu:config ')
 		wf3.add_item(title = 'Checking Team Id: ' + ('✓' if checkClickUpId('team', 'confTeam') else '✗'), valid = True, arg = 'cu:config ')
-		wf3.add_item(title = 'Checking Project Id: ' + ('✓' if checkClickUpId('folder', 'confProject') else '✗'), valid = True, arg = 'cu:config ')
+		if getConfigValue(confNames['confProject']):
+			wf3.add_item(title = 'Checking Project Id: ' + ('✓' if checkClickUpId('folder', 'confProject') else '✗'), valid = True, arg = 'cu:config ')
 	wf3.send_feedback()
 
 
@@ -175,7 +176,7 @@ def getConfigValue(configName):
 			value = wf.settings[configName]
 		else:
 			value = None
-
+	
 	return value
 
 
@@ -190,7 +191,7 @@ def checkClickUpId(idType, configKey):
 	headers = {}
 	headers['Authorization'] = getConfigValue(confNames['confApi'])
 	headers['Content-Type'] = 'application/json'
-
+	
 	# Use requests instead of Workflow.web, as web does not return the response in case of failure (only 401 NOT_AUTHORIZED, which is the same for API key failure or listId etc. failure)
 	import requests
 	request = requests.get(url, headers = headers)
