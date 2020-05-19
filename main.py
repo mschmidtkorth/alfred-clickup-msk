@@ -233,7 +233,7 @@ def checkConfig(wf3):
 	'''
 	if DEBUG > 0:
 		log.debug('[ checkConfig() ]')
-	if getConfigValue(confNames['confApi']) == None or getConfigValue(confNames['confList']) == None or getConfigValue(confNames['confSpace']) == None or getConfigValue(confNames['confTeam']) == None or getConfigValue(confNames['confProject']) == None:
+	if getConfigValue(confNames['confApi']) == None or getConfigValue(confNames['confList']) == None or getConfigValue(confNames['confSpace']) == None or getConfigValue(confNames['confTeam']) == None: # or getConfigValue(confNames['confProject']) == None: Project/Folder is now optional.
 		log.debug('Missing essential variables')
 		wf3.add_item(title = 'We are missing some settings for ClickUp.', subtitle = 'Let\'s set it up?', valid = True, arg = 'cu:config ', icon = ICON_WARNING)
 		wf3.send_feedback()
