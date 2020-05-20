@@ -7,9 +7,6 @@
 #
 from __future__ import unicode_literals
 import sys
-import argparse
-import os
-import json
 from main import DEBUG, formatDate
 from config import confNames, getConfigValue
 from workflow import Workflow, Workflow3, ICON_WEB, ICON_CLOCK, ICON_WARNING, ICON_GROUP, web
@@ -30,8 +27,10 @@ def updateTask(strTaskId):
 ----------
 	@param str strTaskId: Id of the Task to update.
 	'''
+	from workflow.notify import notify
 	if DEBUG > 0:
 		log.debug('[ Calling API to close task ]')
+	wf3 = Workflow3()
 	url = 'https://api.clickup.com/api/v2/task/' + strTaskId
 
 	headers = {}
@@ -46,18 +45,17 @@ def updateTask(strTaskId):
 
 	try:
 		import requests
-		import json
 		request = requests.put(url, json = data, headers = headers)
 		request.raise_for_status()
-	except:
-		log.debug('Error on HTTP request')
+		result = request.json()
+		if DEBUG > 1:
+			log.debug('Response: ' + str(result))
+			notify('Closed Task', result['name'])
+	except Exception as exc:
+		log.debug('Error on HTTP request:' + str(exc))
 		wf3.add_item(title = 'Error connecting to ClickUp.', subtitle = 'Open configuration to check your parameters?', valid = True, arg = 'cu:config ', icon = 'error.png')
 		wf3.send_feedback()
 		exit()
-	result = r.json()
-	if DEBUG > 1:
-		log.debug('Response: ' + str(result))
-		notify('Closed Task', result['name'])
 
 
 if __name__ == "__main__":

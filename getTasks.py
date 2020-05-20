@@ -29,7 +29,7 @@ def getTasks():
 	url = 'https://api.clickup.com/api/v2/team/' + getConfigValue(confNames['confTeam']) + '/task'
 	params = {}
 	wf3 = Workflow3()
-	
+
 	if getConfigValue(confNames['confHierarchyLimit']):
 		if 'space' in getConfigValue(confNames['confHierarchyLimit']):
 			params['space_ids[]'] = getConfigValue(confNames['confSpace']) # Use [] instead of %5B%5D
@@ -40,8 +40,19 @@ def getTasks():
 	params['order_by'] = 'due_date'
 	# Differentiates between listing all Alfred-created tasks and searching for all tasks (any)
 	if DEBUG > 0 and len(wf.args) > 1 and wf.args[1] == 'search':
-		log.debug('[ Mode: Search ]')
+		log.debug('[ Mode: Search (cus) ]')
+	elif DEBUG > 0 and len(wf.args) > 1 and wf.args[1] == 'open':
+		log.debug('[ Mode: Open tasks (cuo) ]')
+		# from datetime import date, datetime, timezone, timedelta
+
+		today = datetime.date.today()
+		todayEndOfDay = datetime.datetime(today.year, today.month, today.day, 23, 59, 59)
+		epoch = datetime.datetime(1970, 1, 1)
+		todayEndOfDayMs = int((todayEndOfDay - epoch).total_seconds() / datetime.timedelta(microseconds = 1).total_seconds() / 1000)
+
+		params['due_date_lt'] = todayEndOfDayMs
 	else:
+		log.debug('[ Mode: List tasks (cul) ]')
 		params['tags[]'] = getConfigValue(confNames['confDefaultTag'])
 	headers = {}
 	headers['Authorization'] = getConfigValue(confNames['confApi'])
@@ -61,13 +72,13 @@ def getTasks():
 	result = request.json()
 	if DEBUG > 1:
 		log.debug('Response: ' + str(result))
-	
+
 	for task in result['tasks']:
 		tags = ''
 		if task['tags']:
 			for allTaskTags in task['tags']:
 				tags += allTaskTags['name'] + ' '
-		
+
 		wf3.add_item(
 			title = '[' + task['status']['status'] + '] ' + task['name'],
 			subtitle = (emoji.emojize(':calendar:') + \

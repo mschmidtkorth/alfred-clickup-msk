@@ -10,10 +10,11 @@ This workflow allows you to use Alfred to quickly add tasks and search tasks wit
   - [Installation & Requirements](#installation--requirements)
   - [Configuration](#configuration)
   - [Usage & Commands](#usage--commands)
-    - [Creating Tasks](#creating-tasks)
+    - [Creating Tasks (`cu`)](#creating-tasks-cu)
       - [Examples](#examples)
-    - [Searching Tasks](#searching-tasks)
-    - [Listing Created Tasks](#listing-created-tasks)
+    - [Searching Tasks (`cus`)](#searching-tasks-cus)
+    - [Listing Open Tasks (`cuo`)](#listing-open-tasks-cuo)
+    - [Listing Created Tasks (`cul`)](#listing-created-tasks-cul)
   - [How to Contribute](#how-to-contribute)
   - [ClickUp Terminology](#clickup-terminology)
   - [Changelog](#changelog)
@@ -54,8 +55,12 @@ The following parameters are *optional*:
 You can validate all parameters via `cu:config validate`. This should be your first step if anything does not work.
 
 ## Usage & Commands
+- `cu` Create a new task
+- `cus` Search for a task
+- `cuo` Show all open tasks
+- `cul` Show all tasks created via Alfred
 
-### Creating Tasks
+### Creating Tasks (`cu`)
 ![Creating a task](docs/ClickUp.gif)
 
 Tasks can be created by providing a title and optional commands.
@@ -65,7 +70,7 @@ Tasks can be created by providing a title and optional commands.
 ```
 
 - Press `Enter` to create the task.
-- Press `? + Enter` to open the created task in ClickUp (web)
+- Press `⌥ + Enter` to open the created task in ClickUp (web)
 
 Commands let you add additional information to your task:
 
@@ -109,7 +114,7 @@ cu Clean the kitchen #Housework #Wife +Personal
 
 > Creates a task titled "Clean the kitchen", tagged with "Housework" and "Wife" due in 2 hours (your default) and assigned to List "Personal".
 
-### Searching Tasks
+### Searching Tasks (`cus`)
 You can search through all of your tasks within your ClickUp workspace. All open tasks matching your search term will be returned. The search uses fuzzy matching, so `Test` will find `Test Task` and `Ted rest`. You can use `cus [<status>]` to filter tasks by status, e.g. `cus [Open]`.
 
 ```text
@@ -117,17 +122,27 @@ cus <search terms>
 ```
 
 - Press `Enter` to open the task in ClickUp (web).
-- Press `? + Enter` to close the selected task (Status = Closed).
+- Press `⌥ + Enter` to close the selected task (Status = Closed).
 
-### Listing Created Tasks
-You can list all of your tasks created via Alfred. This might be convenient if you created tasks in a hurry and want to go through them later in detail.
+### Listing Open Tasks (`cuo`)
+You can list all of your tasks that are due or overdue until end of today.
 
 ```text
-cul
+cuo [<search terms>]
 ```
 
 - Press `Enter` to open the task in ClickUp (web).
-- Press `? + Enter` to close the selected task (Status = Closed).
+- Press `⌥ + Enter` to close the selected task (Status = Closed).
+
+### Listing Created Tasks (`cul`)
+You can list all of your tasks created via Alfred. This might be convenient if you created tasks in a hurry and want to go through them later in detail.
+
+```text
+cul [<search terms>]
+```
+
+- Press `Enter` to open the task in ClickUp (web).
+- Press `⌥ + Enter` to close the selected task (Status = Closed).
 
 *Note:* This only works if you defined a **default tag** via `cu:config defaultTag ` as the tasks are filtered by this tag.
 

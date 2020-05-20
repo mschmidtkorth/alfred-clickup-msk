@@ -100,6 +100,19 @@
 				<false/>
 			</dict>
 		</array>
+		<key>754D5622-7099-4F48-AFFC-820A887D5BEF</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>A3F50AAE-76FE-4454-9D4E-21A7A8DD85B8</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>7EEE5BEF-F3C1-4D93-8613-17B8EA165DD6</key>
 		<array>
 			<dict>
@@ -197,6 +210,19 @@
 				<false/>
 			</dict>
 		</array>
+		<key>9BD3E2BB-F10A-47CD-A1A2-C81B3F84906F</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>A3F50AAE-76FE-4454-9D4E-21A7A8DD85B8</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>A0CCA5BA-AA9E-4B49-84E1-CD10EC7B31C4</key>
 		<array>
 			<dict>
@@ -208,6 +234,29 @@
 				<string></string>
 				<key>sourceoutputuid</key>
 				<string>ED21E0FD-55A6-42FD-A43D-42BC07FF84D8</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>A3F50AAE-76FE-4454-9D4E-21A7A8DD85B8</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>775C64CA-D611-4108-A589-FC069E952581</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>5B13BA71-098E-4B4F-A19B-FF2538432A04</string>
+				<key>modifiers</key>
+				<integer>524288</integer>
+				<key>modifiersubtext</key>
+				<string>Close task?</string>
 				<key>vitoclose</key>
 				<false/>
 			</dict>
@@ -674,6 +723,144 @@ export adj_bonus=15
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<true/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>cuo</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Loading...</string>
+				<key>script</key>
+				<string>mode=open
+
+export query="$1"
+export adj_bonus=15
+
+./fuzzy.py /usr/bin/python -O getTasks.py "$1" "$mode"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string>Keep on typing to filter...</string>
+				<key>title</key>
+				<string>List open tasks</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>A3F50AAE-76FE-4454-9D4E-21A7A8DD85B8</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>triggerid</key>
+				<string>testCuo</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.external</string>
+			<key>uid</key>
+			<string>754D5622-7099-4F48-AFFC-820A887D5BEF</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>browser</key>
+				<string></string>
+				<key>spaces</key>
+				<string></string>
+				<key>url</key>
+				<string></string>
+				<key>utf8</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.openurl</string>
+			<key>uid</key>
+			<string>775C64CA-D611-4108-A589-FC069E952581</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>action</key>
+				<integer>0</integer>
+				<key>argument</key>
+				<integer>0</integer>
+				<key>focusedappvariable</key>
+				<false/>
+				<key>focusedappvariablename</key>
+				<string></string>
+				<key>hotkey</key>
+				<integer>0</integer>
+				<key>hotmod</key>
+				<integer>0</integer>
+				<key>leftcursor</key>
+				<false/>
+				<key>modsmode</key>
+				<integer>0</integer>
+				<key>relatedAppsMode</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.hotkey</string>
+			<key>uid</key>
+			<string>9BD3E2BB-F10A-47CD-A1A2-C81B3F84906F</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>/usr/bin/python -O closeTask.py "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>5B13BA71-098E-4B4F-A19B-FF2538432A04</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>triggerid</key>
 				<string>testCus</string>
 			</dict>
@@ -945,7 +1132,7 @@ For details, see https://github.com/mschmidtkorth/alfred-clickup-msk/blob/master
 		<key>12671D12-381F-4421-BBA4-9AD759EF917B</key>
 		<dict>
 			<key>colorindex</key>
-			<integer>9</integer>
+			<integer>2</integer>
 			<key>note</key>
 			<string>Open task in ClickUp (web)</string>
 			<key>xpos</key>
@@ -962,8 +1149,6 @@ For details, see https://github.com/mschmidtkorth/alfred-clickup-msk/blob/master
 		</dict>
 		<key>1B93955D-DBE9-4DDF-A31D-14BC5893086A</key>
 		<dict>
-			<key>colorindex</key>
-			<integer>9</integer>
 			<key>xpos</key>
 			<integer>60</integer>
 			<key>ypos</key>
@@ -974,7 +1159,7 @@ For details, see https://github.com/mschmidtkorth/alfred-clickup-msk/blob/master
 			<key>xpos</key>
 			<integer>925</integer>
 			<key>ypos</key>
-			<integer>1195</integer>
+			<integer>1360</integer>
 		</dict>
 		<key>2D04485C-2EC5-4183-9205-C88FC70D60CC</key>
 		<dict>
@@ -985,19 +1170,30 @@ For details, see https://github.com/mschmidtkorth/alfred-clickup-msk/blob/master
 			<key>xpos</key>
 			<integer>560</integer>
 			<key>ypos</key>
-			<integer>615</integer>
+			<integer>830</integer>
 		</dict>
 		<key>4F92F09E-B230-4A20-B69D-7F672A076620</key>
 		<dict>
 			<key>xpos</key>
 			<integer>60</integer>
 			<key>ypos</key>
-			<integer>935</integer>
+			<integer>1100</integer>
+		</dict>
+		<key>5B13BA71-098E-4B4F-A19B-FF2538432A04</key>
+		<dict>
+			<key>colorindex</key>
+			<integer>2</integer>
+			<key>note</key>
+			<string>Close task by calling API</string>
+			<key>xpos</key>
+			<integer>760</integer>
+			<key>ypos</key>
+			<integer>770</integer>
 		</dict>
 		<key>5E75B7DC-E5A3-4BBB-AF7F-5F0015663550</key>
 		<dict>
 			<key>colorindex</key>
-			<integer>2</integer>
+			<integer>8</integer>
 			<key>note</key>
 			<string>Create task by calling API</string>
 			<key>xpos</key>
@@ -1016,14 +1212,32 @@ Uses fuzzy search instead of Alfred filtering.</string>
 			<key>xpos</key>
 			<integer>235</integer>
 			<key>ypos</key>
-			<integer>615</integer>
+			<integer>830</integer>
 		</dict>
 		<key>70C8F12D-5C29-48AF-96AD-3402AC1526E0</key>
 		<dict>
 			<key>xpos</key>
 			<integer>60</integer>
 			<key>ypos</key>
-			<integer>615</integer>
+			<integer>830</integer>
+		</dict>
+		<key>754D5622-7099-4F48-AFFC-820A887D5BEF</key>
+		<dict>
+			<key>xpos</key>
+			<integer>60</integer>
+			<key>ypos</key>
+			<integer>610</integer>
+		</dict>
+		<key>775C64CA-D611-4108-A589-FC069E952581</key>
+		<dict>
+			<key>colorindex</key>
+			<integer>8</integer>
+			<key>note</key>
+			<string>Open task in ClickUp (web)</string>
+			<key>xpos</key>
+			<integer>760</integer>
+			<key>ypos</key>
+			<integer>610</integer>
 		</dict>
 		<key>7EEE5BEF-F3C1-4D93-8613-17B8EA165DD6</key>
 		<dict>
@@ -1035,7 +1249,7 @@ Uses fuzzy search instead of Alfred filtering.</string>
 		<key>89E3D445-87BF-4018-A2A3-766FD017A667</key>
 		<dict>
 			<key>colorindex</key>
-			<integer>9</integer>
+			<integer>2</integer>
 			<key>note</key>
 			<string>Receives all tasks created via ClickUp by filtering on to_sort.
 Search term optional.
@@ -1047,12 +1261,14 @@ Uses fuzzy search instead of Alfred filtering.</string>
 		</dict>
 		<key>8E1A5F8C-D577-44AB-858C-AC4363A8DA38</key>
 		<dict>
+			<key>colorindex</key>
+			<integer>8</integer>
 			<key>note</key>
 			<string>Update settings</string>
 			<key>xpos</key>
 			<integer>565</integer>
 			<key>ypos</key>
-			<integer>1175</integer>
+			<integer>1340</integer>
 		</dict>
 		<key>928E324A-D0AD-43AC-A186-6811DC562D6E</key>
 		<dict>
@@ -1066,13 +1282,13 @@ Uses fuzzy search instead of Alfred filtering.</string>
 		<key>93B9EBF6-0E96-405A-B80B-4B987B9258FA</key>
 		<dict>
 			<key>colorindex</key>
-			<integer>2</integer>
+			<integer>8</integer>
 			<key>note</key>
 			<string>List settings</string>
 			<key>xpos</key>
 			<integer>240</integer>
 			<key>ypos</key>
-			<integer>935</integer>
+			<integer>1100</integer>
 		</dict>
 		<key>94E466F6-713D-43E2-9CC3-419335AE9D6B</key>
 		<dict>
@@ -1090,6 +1306,13 @@ Uses fuzzy search instead of Alfred filtering.</string>
 			<key>ypos</key>
 			<integer>230</integer>
 		</dict>
+		<key>9BD3E2BB-F10A-47CD-A1A2-C81B3F84906F</key>
+		<dict>
+			<key>xpos</key>
+			<integer>60</integer>
+			<key>ypos</key>
+			<integer>715</integer>
+		</dict>
 		<key>A0CCA5BA-AA9E-4B49-84E1-CD10EC7B31C4</key>
 		<dict>
 			<key>xpos</key>
@@ -1097,17 +1320,30 @@ Uses fuzzy search instead of Alfred filtering.</string>
 			<key>ypos</key>
 			<integer>145</integer>
 		</dict>
+		<key>A3F50AAE-76FE-4454-9D4E-21A7A8DD85B8</key>
+		<dict>
+			<key>colorindex</key>
+			<integer>8</integer>
+			<key>note</key>
+			<string>Receives all tasks created via ClickUp by filtering on to_sort.
+Search term optional.
+Uses fuzzy search instead of Alfred filtering.</string>
+			<key>xpos</key>
+			<integer>230</integer>
+			<key>ypos</key>
+			<integer>610</integer>
+		</dict>
 		<key>AB5AFC20-63DF-405D-9700-3552BFF57A9D</key>
 		<dict>
 			<key>xpos</key>
 			<integer>745</integer>
 			<key>ypos</key>
-			<integer>1195</integer>
+			<integer>1360</integer>
 		</dict>
 		<key>BA60D8FC-3366-47F1-BDF9-824C1E5C1E39</key>
 		<dict>
 			<key>colorindex</key>
-			<integer>9</integer>
+			<integer>8</integer>
 			<key>note</key>
 			<string>'Alfred filters results' deactivated as input box (which would be used to filter) is updated with each keystroke.</string>
 			<key>xpos</key>
@@ -1122,7 +1358,7 @@ Uses fuzzy search instead of Alfred filtering.</string>
 			<key>xpos</key>
 			<integer>520</integer>
 			<key>ypos</key>
-			<integer>965</integer>
+			<integer>1130</integer>
 		</dict>
 		<key>E09B9161-F260-4D26-9561-D857E6C992DD</key>
 		<dict>
@@ -1138,7 +1374,7 @@ Uses fuzzy search instead of Alfred filtering.</string>
 			<key>xpos</key>
 			<integer>60</integer>
 			<key>ypos</key>
-			<integer>720</integer>
+			<integer>935</integer>
 		</dict>
 		<key>EEEF79EA-AE26-4770-94DD-1D116CE46422</key>
 		<dict>
@@ -1158,7 +1394,7 @@ Uses fuzzy search instead of Alfred filtering.</string>
 		</dict>
 	</dict>
 	<key>version</key>
-	<string>1.0.6</string>
+	<string>1.1.0</string>
 	<key>webaddress</key>
 	<string>https://github.com/mschmidtkorth/alfred-clickup-msk/</string>
 </dict>
