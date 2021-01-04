@@ -1,8 +1,6 @@
 # ClickUp 2.0 Alfred Workflow
 This workflow allows you to use Alfred to quickly add tasks and search tasks within ClickUp 2.0.
 
-**Note:** This is the first public release - bugs may be numerous. Let me know if you find any!
-
 ## Contents
 
 - [ClickUp 2.0 Alfred Workflow](#clickup-20-alfred-workflow)
@@ -173,6 +171,7 @@ https://docs.clickup.com/en/articles/1045623-how-does-the-hierarchy-structure-wo
 -->
 
 ## Changelog
+See [Releases](https://github.com/mschmidtkorth/alfred-clickup-msk/releases)
 
 - 1.0
   - Initial version, first public release
