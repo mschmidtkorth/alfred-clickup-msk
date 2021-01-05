@@ -258,7 +258,7 @@
 				<key>modifiersubtext</key>
 				<string>Close task?</string>
 				<key>vitoclose</key>
-				<false/>
+				<true/>
 			</dict>
 		</array>
 		<key>AB5AFC20-63DF-405D-9700-3552BFF57A9D</key>
@@ -594,6 +594,8 @@
 			<dict>
 				<key>argument</key>
 				<string>{query}</string>
+				<key>passthroughargument</key>
+				<false/>
 				<key>variables</key>
 				<dict>
 					<key>optInput</key>
@@ -1394,7 +1396,7 @@ Uses fuzzy search instead of Alfred filtering.</string>
 		</dict>
 	</dict>
 	<key>version</key>
-	<string>1.1.0</string>
+	<string>1.1.1</string>
 	<key>webaddress</key>
 	<string>https://github.com/mschmidtkorth/alfred-clickup-msk/</string>
 </dict>

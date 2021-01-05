@@ -25,7 +25,7 @@ def configuration():
 		query = wf.args[0]
 	else:
 		query = None
-	
+
 	if not query:
 		apiKeyValue = getConfigValue(confNames['confApi'])
 		dueValue = getConfigValue(confNames['confDue'])
@@ -40,16 +40,16 @@ def configuration():
 			notificationValue = '✗'
 		defaultTagValue = getConfigValue(confNames['confDefaultTag'])
 		hierarchyLimitValue = getConfigValue(confNames['confHierarchyLimit'])
-		
+
 		wf3.add_item(title = 'Set API key' + (' (' + apiKeyValue + ')' if apiKeyValue else ''), subtitle = 'Your personal ClickUp API key/token.', valid = False, autocomplete = confNames['confApi'] + ' ')
-		wf3.add_item(title = 'Set default due date' + (' (' + dueValue + ')' if dueValue else ''), subtitle = 'e.g. m30 (in 30 minutes), h2 (in two hours), d1 (in one day), w1 (in one week)', valid = False, autocomplete = confNames['confDue'] + ' ')
-		wf3.add_item(title = 'Set ClickUp workspace' + (' (' + teamValue + ')' if teamValue else ''), subtitle = 'Workspace that defines which tasks can be searched', valid = False, autocomplete = confNames['confTeam'] + ' ')
-		wf3.add_item(title = 'Set ClickUp space' + (' (' + spaceValue + ')' if spaceValue else ''), subtitle = 'Space that defines your available labels and priorities', valid = False, autocomplete = confNames['confSpace'] + ' ')
+		wf3.add_item(title = 'Set default due date' + (' (' + dueValue + ')' if dueValue else ''), subtitle = 'e.g. m30 (in 30 minutes), h2 (in two hours), d1 (in one day), w1 (in one week).', valid = False, autocomplete = confNames['confDue'] + ' ')
+		wf3.add_item(title = 'Set ClickUp workspace' + (' (' + teamValue + ')' if teamValue else ''), subtitle = 'Workspace that defines which tasks can be searched.', valid = False, autocomplete = confNames['confTeam'] + ' ')
+		wf3.add_item(title = 'Set ClickUp space' + (' (' + spaceValue + ')' if spaceValue else ''), subtitle = 'Space that defines your available labels and priorities.', valid = False, autocomplete = confNames['confSpace'] + ' ')
 		wf3.add_item(title = 'Set ClickUp folder' + (' (' + projectValue + ')' if projectValue else ''), subtitle = 'Folder that which tasks can be searched. The Folder must be part of the workspace.', valid = False, autocomplete = confNames['confProject'] + ' ')
-		wf3.add_item(title = 'Set default ClickUp list' + (' (' + listValue + ')' if listValue else ''), subtitle = 'List you want to add tasks to by default', valid = False, autocomplete = confNames['confList'] + ' ')
+		wf3.add_item(title = 'Set default ClickUp list' + (' (' + listValue + ')' if listValue else ''), subtitle = 'List you want to add tasks to by default.', valid = False, autocomplete = confNames['confList'] + ' ')
 		wf3.add_item(title = 'Set Show Notification' + (' (' + notificationValue + ')' if notificationValue else ''), subtitle = 'Show notification after creating task?', valid = False, autocomplete = confNames['confNotification'] + ' ')
 		wf3.add_item(title = 'Set default Tag' + (' (' + defaultTagValue + ')' if defaultTagValue else ''), subtitle = 'Tag that is added to all new tasks.', valid = False, autocomplete = confNames['confDefaultTag'] + ' ')
-		wf3.add_item(title = 'Set hierarchy levels to limit search results' + (' (' + hierarchyLimitValue + ')' if hierarchyLimitValue else ''), subtitle = 'Levels to lmit search results by (list, folder, space).', valid = False, autocomplete = confNames['confHierarchyLimit'] + ' ')
+		wf3.add_item(title = 'Set hierarchy levels to limit search results' + (' (' + hierarchyLimitValue + ')' if hierarchyLimitValue else ''), subtitle = 'Levels to limit search results by (list, folder, space).', valid = False, autocomplete = confNames['confHierarchyLimit'] + ' ')
 		wf3.add_item(title = 'Validate Configuration', subtitle = 'Check if provided configuration parameters are valid.', valid = False, autocomplete = 'validate', icon = './settings.png')
 		clearCache = wf3.add_item(title = 'Clear Cache', subtitle = 'Clear list of available labels and lists to be retrieved again.', valid = True, arg = 'cu:config cache', icon = './settings.png')
 		clearCache.setvar('isSubmitted', 'true') # No secondary screen necessary
@@ -176,7 +176,7 @@ def getConfigValue(configName):
 			value = wf.settings[configName]
 		else:
 			value = None
-	
+
 	return value
 
 
@@ -191,7 +191,7 @@ def checkClickUpId(idType, configKey):
 	headers = {}
 	headers['Authorization'] = getConfigValue(confNames['confApi'])
 	headers['Content-Type'] = 'application/json'
-	
+
 	# Use requests instead of Workflow.web, as web does not return the response in case of failure (only 401 NOT_AUTHORIZED, which is the same for API key failure or listId etc. failure)
 	import requests
 	request = requests.get(url, headers = headers)
