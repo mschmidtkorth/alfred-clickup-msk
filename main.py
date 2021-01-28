@@ -474,6 +474,30 @@ def getDueFromInput(query):
 				log.debug(nextWeekday(datetime.datetime.today(), naturalLanguageWeekdays[value.split(' ')[0].lower()]))
 			elif value.split(' ')[0].lower() in naturalLanguageRelativeDays.keys(): # Get date of today/tomorrow
 				naturalValue = datetime.datetime.today() + datetime.timedelta(naturalLanguageRelativeDays[value.split(' ')[0].lower()])
+				time = re.search(r'(2[0-3]|[01]?[0-9])\.[0-5]?[0-9](\.[0-5]?[0-9])?', value)
+
+				h = 0
+				m = 0
+				if (time and time.group()) or len(value.split(' ')) > 1:
+					if time and '.' in time.group():
+						if DEBUG > 1:
+							log.debug('Found time: ' + str(time.group()))
+						# e.g. @today 14.00
+						h = int(time.group().split('.')[0])
+						m = int(time.group().split('.')[1])
+					elif len(value.split(' ')) > 1:
+						if not isInteger(value.split(' ')[1]):
+							wf3.add_item(
+								title = 'Not a valid time.',
+								subtitle = 'Please use 24h time format with a dot - example: 15.00',
+								valid = False,
+								autocomplete = query + ' ',
+								icon = ICON_WARNING
+							)
+							wf3.send_feedback()
+							exit()
+						h = int(value.split(' ')[1])
+					naturalValue = (datetime.datetime.today() + datetime.timedelta(naturalLanguageRelativeDays[value.split(' ')[0].lower()])).replace(hour = h, minute = m)
 				if DEBUG > 1:
 					log.debug('Received relative date: ' + str(naturalValue))
 				log.debug(datetime.datetime.today() + datetime.timedelta(naturalLanguageRelativeDays[value.split(' ')[0].lower()]))
@@ -488,7 +512,7 @@ def getDueFromInput(query):
 					if DEBUG > 1:
 						log.debug('Found date: ' + str(date.group()))
 					try:
-						naturalValue = datetime.datetime.strptime(date.group() + 'T' + datetime.datetime.now().strftime("%H.%M.%S"), '%Y-%m-%dT%H.%M.%S') # Convert string 'date + current time' to dateTime.
+						naturalValue = datetime.datetime.strptime(date.group() + 'T' + datetime.datetime.now().strftime("%H.%M.%S"), '%Y-%m-%dT%H.%M.%S') # Convert string 'date + current time' to dateTime
 					except ValueError: # Incorrect format, e.g. 2020-01-1
 						naturalValue = ''
 						pass
@@ -589,6 +613,19 @@ def getPriorityFromInput(query):
 
 	return inputPriority
 
+def isInteger(n):
+	'''Determines if string can be considered as integer
+
+----------
+	@param str value: The value to check.
+	'''
+	try:
+		int(n)
+	except ValueError:
+		pass
+		return False
+	else:
+		return True # float(n).is_integer()
 
 def main(wf):
 	global query
