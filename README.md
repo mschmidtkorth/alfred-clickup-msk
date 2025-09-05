@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> **Project is no longer in active development.**
+>
+> [Find an updated fork for Python 3 here](https://github.com/four13co/alfred-clickup-four13).
+
 # ClickUp 2.0 Alfred Workflow
 This workflow allows you to use Alfred to quickly add tasks and search tasks within ClickUp 2.0.
 
